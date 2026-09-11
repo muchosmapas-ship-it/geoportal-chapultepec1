@@ -5,6 +5,7 @@
     <title>Geoportal Evaluación del estado del arbolado en Chapultepec</title>
     <link rel="stylesheet" href="bower_components/bootstrap.min.css">
     <link rel="stylesheet" href="bower_components/ol.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v4.6.5/css/ol.css">
     <link rel="stylesheet" href="css/style.css?v=25">
     <link rel="icon" type="image/png" href="img/favicon.ico">
 </head>
@@ -68,7 +69,8 @@
     </div>
 </div>
 
-<script src="bower_components/ol.js?v=48"></script>
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v4.6.5/build/ol.js"></script>
+<script>window.ol || document.write('<script src="bower_components/ol.js"><\/script>')</script>
 <script src="data/config.js?v=48"></script>
 <script src="js/app.js?v=48"></script>
 </body>
