@@ -155,7 +155,7 @@ window.__CONFIG = {
             "color": "#1e88e5",
             "label": "Subzonas (188 poligonos)",
             "url": "./data/subzonas.geojson?v=17",
-            "visible": true
+            "visible": false
         }
     },
     "ZOOM": 14
