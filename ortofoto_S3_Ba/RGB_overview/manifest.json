@@ -1,0 +1,41 @@
+{
+  "name": "seccion3_barrilaco",
+  "source": "F:\\INYDES\\Vuelos\\Seccion3\\Corte\\Ortomosaico_Seccion_3_Ba.jp2",
+  "attribution": "Orto UAV INyDES 2026 S3 Barrilaco - overview 50cm/px",
+  "tile_size": 256,
+  "min_zoom": 13,
+  "max_zoom": 17,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.22848125395201,
+    19.40874542107389,
+    -99.2163546516713,
+    19.42806389886601
+  ],
+  "bbox_3857": [
+    -11046064.00537983,
+    2203118.6766649876,
+    -11044714.078188889,
+    2205398.908709016
+  ],
+  "center_4326": [
+    -99.22241795281165,
+    19.41840465996995
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 69,
+    "bytes": 1145255,
+    "per_zoom": {
+      "13": 1,
+      "14": 2,
+      "15": 6,
+      "16": 15,
+      "17": 45
+    },
+    "zmax_natural": 5
+  },
+  "generated_at": "2026-09-11T10:42:27-0600"
+}

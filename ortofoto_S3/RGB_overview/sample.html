@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>seccion3 - Visor de prueba</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .attr { background: rgba(255,255,255,0.8); padding: 2px 6px; font-size: 11px; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var bounds = [[19.396557935771312, -99.22642460230996], [19.419429887243723, -99.20511334097769]];
+  var map = L.map('map', { maxBounds: bounds, maxZoom: 17 });
+  L.tileLayer('./tiles/{z}/{x}/{y}.png', {
+    minZoom: 13,
+    maxZoom: 17,
+    maxNativeZoom: 17,
+    tms: false,
+    attribution: "Orto UAV INyDES 2026 S3 - overview 50cm/px"
+  }).addTo(map);
+  map.fitBounds(bounds);
+</script>
+</body>
+</html>

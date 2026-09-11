@@ -1,0 +1,41 @@
+{
+  "name": "seccion1",
+  "source": "F:\\INYDES\\Vuelos\\seccion1\\ortomosaico\\Ortomosaico_S1_5cm.tif",
+  "attribution": "Orto UAV INyDES 2026 S1 - overview 50cm/px",
+  "tile_size": 256,
+  "min_zoom": 13,
+  "max_zoom": 17,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.19609848228562,
+    19.41211964482139,
+    -99.17592565992874,
+    19.42973489840738
+  ],
+  "bbox_3857": [
+    -11042459.171727452,
+    2203516.9293565205,
+    -11040213.543414822,
+    2205596.1557605676
+  ],
+  "center_4326": [
+    -99.18601207110717,
+    19.420927271614385
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 107,
+    "bytes": 5988211,
+    "per_zoom": {
+      "13": 2,
+      "14": 4,
+      "15": 9,
+      "16": 20,
+      "17": 72
+    },
+    "zmax_natural": 5
+  },
+  "generated_at": "2026-09-11T10:41:33-0600"
+}

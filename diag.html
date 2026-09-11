@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Diag - Solo Arboles</title>
+    <link rel="stylesheet" href="bower_components/ol.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: monospace; background: #1e1e1e; color: #0f0; }
+        #log { position: fixed; top: 0; left: 0; right: 0; max-height: 200px; overflow-y: auto;
+               background: #000; padding: 6px; z-index: 9999; font-size: 11px; line-height: 1.3;
+               border-bottom: 2px solid #0f0; }
+        #log .err { color: #f55; font-weight: bold; }
+        #log .warn { color: #fa0; }
+        #log .ok { color: #0f0; }
+        #log .info { color: #0cf; }
+        #log b { color: #fff; }
+        #map { width: 100vw; height: 100vh; margin-top: 200px; }
+        #status { position: fixed; bottom: 0; left: 0; right: 0; background: #000; color: #fff;
+                  padding: 4px 8px; font-size: 11px; z-index: 9999; }
+    </style>
+</head>
+<body>
+<div id="log">=== DIAGNOSTICO SOLO ARBOLES v=27 ===<br></div>
+<div id="status">Cargando...</div>
+<div id="map"></div>
+<script src="bower_components/ol.js"></script>
+<script>
+const log = document.getElementById('log');
+const statusEl = document.getElementById('status');
+function L(msg, cls) {
+    const d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.innerHTML = msg;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+}
+
+L('1. Cargando config.js...');
+fetch('./data/config.js?v=27')
+    .then(r => r.text())
+    .then(txt => {
+        const m = txt.match(/window\.__CONFIG\s*=\s*(\{[\s\S]*?\});/);
+        let cfg = eval('(' + m[1] + ')');
+        const arb = cfg.OVERLAY_LAYERS.arboles;
+        L('2. <b>arboles cfg</b>: cluster=' + arb.cluster + ' dist=' + arb.clusterDistance +
+          ' url=' + arb.url + ' visible=' + arb.visible, 'info');
+
+        const map = new ol.Map({
+            target: 'map',
+            layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+            view: new ol.View({
+                projection: 'EPSG:3857',
+                center: ol.proj.fromLonLat(cfg.CENTER),
+                zoom: cfg.ZOOM
+            })
+        });
+        L('3. Mapa OK en z=' + map.getView().getZoom(), 'ok');
+
+        L('4. Fetching ' + arb.url);
+        return fetch(arb.url).then(r => {
+            L('5. HTTP ' + r.status + ' (' + r.headers.get('content-length') + ' bytes)', r.ok ? 'ok' : 'err');
+            return r.json();
+        }).then(data => {
+            L('6. JSON: ' + data.features.length + ' features', 'ok');
+            const features = new ol.format.GeoJSON().readFeatures(data, {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:3857'
+            });
+            L('7. OL features: ' + features.length, 'ok');
+
+            const vectorSource = new ol.source.Vector({ features });
+            const clusterSource = new ol.source.Cluster({
+                distance: arb.clusterDistance || 50,
+                source: vectorSource,
+            });
+            const layer = new ol.layer.Vector({
+                source: clusterSource,
+                style: function(feature) {
+                    const fs = feature.get('features') || [];
+                    const size = fs.length;
+                    if (size === 1) {
+                        return new ol.style.Style({
+                            image: new ol.style.Circle({
+                                radius: 4,
+                                fill: new ol.style.Fill({ color: '#2e7d32' }),
+                                stroke: new ol.style.Stroke({ color: '#fff', width: 1 })
+                            })
+                        });
+                    }
+                    return new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 14,
+                            fill: new ol.style.Fill({ color: 'rgba(46,125,50,0.7)' }),
+                            stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+                        }),
+                        text: new ol.style.Text({
+                            text: size.toString(),
+                            fill: new ol.style.Fill({ color: '#fff' }),
+                            font: 'bold 12px sans-serif'
+                        })
+                    });
+                },
+                zIndex: 101
+            });
+            map.addLayer(layer);
+
+            const clusterFeats = clusterSource.getFeatures();
+            L('8. Cluster features: ' + clusterFeats.length, 'ok');
+
+            // Histograma
+            const sizes = {};
+            clusterFeats.forEach(cf => {
+                const s = (cf.get('features') || []).length;
+                sizes[s] = (sizes[s] || 0) + 1;
+            });
+            const sorted = Object.entries(sizes).sort((a,b) => parseInt(a) - parseInt(b));
+            L('9. <b>Distribucion clusters</b>: ' + sorted.slice(0,15).map(([s,c]) => `${s}=${c}`).join(' '), 'info');
+            if (sorted.length > 15) L('   ... y ' + (sorted.length-15) + ' tamanos mas', 'info');
+
+            // Top 5 mas grandes
+            clusterFeats.sort((a,b) => (b.get('features')||[]).length - (a.get('features')||[]).length);
+            L('10. <b>Top 5 clusters mas grandes</b>: ' +
+              clusterFeats.slice(0,5).map(f => (f.get('features')||[]).length).join(', '), 'info');
+
+            // Extent
+            const ext = clusterSource.getExtent();
+            L('11. Extent (m): [' + ext.map(x => x.toFixed(0)).join(', ') + ']', 'info');
+            const c = map.getView().getCenter();
+            const inside = ol.extent.containsCoordinate(ext, c);
+            L('12. Centro dentro del extent: ' + inside, inside ? 'ok' : 'warn');
+
+            // Estado visible
+            L('13. Layer visible: ' + layer.getVisible(), 'ok');
+
+            // Forzar render y ver pixel en el centro
+            map.renderSync();
+            const pixel = map.getPixelFromCoordinate(c);
+            const hasFeature = map.hasFeatureAtPixel(pixel);
+            L('14. Hay feature en el pixel central: ' + hasFeature, hasFeature ? 'ok' : 'warn');
+
+            statusEl.innerHTML = `<b style="color:#0f0">LISTO</b> | clusters=${clusterFeats.length} | top5=${clusterFeats.slice(0,5).map(f=>(f.get('features')||[]).length).join(',')} | zoom=${map.getView().getZoom()} | extent dentro=${inside}`;
+        });
+    })
+    .catch(e => {
+        L('FATAL: ' + e.message, 'err');
+        L('Stack: ' + (e.stack || ''), 'err');
+        statusEl.innerHTML = '<b style="color:#f55">ERROR</b>: ' + e.message;
+    });
+
+window.addEventListener('error', e => L('JS ERROR: ' + e.message + ' @ ' + e.filename + ':' + e.lineno, 'err'));
+</script>
+</body>
+</html>

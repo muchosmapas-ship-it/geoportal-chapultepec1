@@ -1,0 +1,75 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Geoportal Evaluación del estado del arbolado en Chapultepec</title>
+    <link rel="stylesheet" href="bower_components/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/ol.css">
+    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="icon" type="image/png" href="img/favicon.ico">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-primary visor-nav">
+    <div class="container-fluid">
+        <span class="navbar-brand">Geoportal Evaluación del estado del arbolado en Chapultepec</span>
+        <span class="text-light small">PT Gestion Territorial - INyDES 2026</span>
+    </div>
+</nav>
+<div class="visor-container">
+    <aside class="visor-sidebar">
+        <section class="card visor-card">
+            <div class="card-header bg-info text-white">Busqueda con autocompletado</div>
+            <div class="card-body">
+                <input id="search-input" type="text" class="form-control form-control-sm"
+                       placeholder="Buscar subzona, codigo, nombre..."
+                       autocomplete="off">
+                <div id="autocomplete" class="autocomplete-list"></div>
+                <div id="select-status" style="font-size:10px;color:#666;margin-top:4px;"></div>
+            </div>
+        </section>
+
+        <section class="card visor-card">
+            <div class="card-header bg-secondary text-white">Capas</div>
+            <div class="card-body" id="overlay-panel">Cargando...</div>
+        </section>
+
+        <section class="card visor-card">
+            <div class="card-header bg-success text-white">Ortomosaico</div>
+            <div class="card-body" id="base-panel">Cargando...</div>
+        </section>
+
+        <section class="card visor-card">
+            <div class="card-header bg-info text-white">Sugerencias</div>
+            <div class="card-body small">
+                <p class="mb-1">Activa/desactiva capas en <strong>Capas</strong>.</p>
+                <p class="mb-1">Escribe en el buscador para ir a una subzona o filtrar arboles.</p>
+                <p class="mb-0">Click en el mapa para ver detalles de un elemento.</p>
+            </div>
+        </section>
+
+        <section class="card visor-card">
+            <div class="card-header bg-light text-dark">Acerca de</div>
+            <div class="card-body small" id="acerca-de">
+                <p class="mb-1"><strong>Bosque de Chapultepec</strong></p>
+                <p class="mb-1">Ortofoto UAV - Vuelo: 2026 ·</p>
+                <p class="mb-0">SEDEMA/ INyDES / UnADM</p>
+            </div>
+        </section>
+    </aside>
+    <main id="map" class="visor-map"></main>
+</div>
+<div id="info-panel" class="visor-info-panel" hidden>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span><strong>Informacion del feature</strong></span>
+            <button class="btn btn-sm btn-light" id="close-info">x</button>
+        </div>
+        <div class="card-body" id="info-content">Haz click en una subzona para ver detalles.</div>
+    </div>
+</div>
+
+<script src="bower_components/ol.js?v=48"></script>
+<script src="data/config.js?v=48"></script>
+<script src="js/app.js?v=48"></script>
+</body>
+</html>

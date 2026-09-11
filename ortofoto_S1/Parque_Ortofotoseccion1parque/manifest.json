@@ -1,0 +1,38 @@
+{
+  "name": "🟢 RGB Parque Libano (S1)",
+  "source": "F:\\INYDES\\Vuelos\\seccion1\\Ortomosaico_P_Líbano_Peri_Memorial\\Ortofoto seccion 1 parque.tif",
+  "attribution": "Ortofoto UAV — INyDES 2026 — GSD 5cm/px — Parque L\\u00edbano",
+  "tile_size": 256,
+  "min_zoom": 18,
+  "max_zoom": 19,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.20301956809004,
+    19.423106920480443,
+    -99.19748235924705,
+    19.42960102974952
+  ],
+  "bbox_3857": [
+    -11043229.623474937,
+    2204813.79219534,
+    -11042613.224206118,
+    2205580.3536479142
+  ],
+  "center_4326": [
+    -99.20025096366854,
+    19.42635397511498
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 129,
+    "bytes": 7043083,
+    "per_zoom": {
+      "18": 30,
+      "19": 99
+    },
+    "zmax_natural": 6
+  },
+  "generated_at": "2026-09-09T17:22:41-0600"
+}

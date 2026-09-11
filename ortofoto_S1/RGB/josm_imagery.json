@@ -1,0 +1,32 @@
+{
+  "instructions_es": [
+    "1. Levantar servidor local en la carpeta de salida:",
+    "     cd ortofoto_S1\\RGB",
+    "     python -m http.server 8000",
+    "2. En JOSM: Edit > Preferences > Imagery > + (Custom)",
+    "3. Pegar uno de los url de abajo como 'Tile URL'",
+    "4. Name: Ortofoto S1",
+    "5. Attribution: Ortofoto UAV — INyDES 2026 — GSD 5cm/px",
+    "6. Max zoom: 19"
+  ],
+  "tile_url_examples": {
+    "local_server": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "static_export": "tiles/{z}/{x}/{y}.png",
+    "github_pages_example": "https://<TU_USUARIO>.github.io/<TU_REPO>/tiles/{z}/{x}/{y}.png"
+  },
+  "josm_preferences_snippet": {
+    "_comment": "Pegar bajo imagery.layers en preferencias de JOSM",
+    "name": "Ortofoto S1",
+    "type": "tms",
+    "url": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "min_zoom": 15,
+    "max_zoom": 19,
+    "attribution": "Ortofoto UAV — INyDES 2026 — GSD 5cm/px",
+    "bbox": {
+      "min_lon": -99.19609848228562,
+      "min_lat": 19.412116488631042,
+      "max_lon": -99.1759266103609,
+      "max_lat": 19.429734899330555
+    }
+  }
+}

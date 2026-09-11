@@ -1,0 +1,41 @@
+{
+  "name": "Ortofoto S1",
+  "source": "F:\\INYDES\\Vuelos\\seccion1\\ortomosaico\\Ortomosaico_Sección_1_r.jp2",
+  "attribution": "Ortofoto UAV — INyDES 2026 — GSD 5cm/px",
+  "tile_size": 256,
+  "min_zoom": 15,
+  "max_zoom": 19,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.19609848228562,
+    19.412116488631042,
+    -99.1759266103609,
+    19.429734899330555
+  ],
+  "bbox_3857": [
+    -11042459.171727452,
+    2203516.556834002,
+    -11040213.649216445,
+    2205596.1558695403
+  ],
+  "center_4326": [
+    -99.18601254632327,
+    19.4209256939808
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 1211,
+    "bytes": 90507970,
+    "per_zoom": {
+      "15": 9,
+      "16": 20,
+      "17": 72,
+      "18": 240,
+      "19": 870
+    },
+    "zmax_natural": 8
+  },
+  "generated_at": "2026-09-09T17:05:39-0600"
+}

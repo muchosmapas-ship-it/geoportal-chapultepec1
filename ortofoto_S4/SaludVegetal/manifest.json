@@ -1,0 +1,41 @@
+{
+  "name": "Chapultepec Seccion 4 - Salud Vegetal 2026",
+  "source": "F:\\INYDES\\Vuelos\\Seccion4\\Ortomosaico\\s4\\Ortomosaico_Seccion_4_Salud_Vegetal.tif",
+  "attribution": "Salud Vegetal UAV - Seccion 4 Chapultepec - INyDES 2026 - GSD 5cm",
+  "tile_size": 256,
+  "min_zoom": 15,
+  "max_zoom": 19,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.23841691327509,
+    19.386526842337435,
+    -99.22299114751803,
+    19.39407859671367
+  ],
+  "bbox_3857": [
+    -11047170.03791637,
+    2200496.4697695095,
+    -11045452.849527197,
+    2201387.677540518
+  ],
+  "center_4326": [
+    -99.23070403039657,
+    19.39030271952555
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 447,
+    "bytes": 26812057,
+    "per_zoom": {
+      "15": 4,
+      "16": 12,
+      "17": 28,
+      "18": 91,
+      "19": 312
+    },
+    "zmax_natural": 7
+  },
+  "generated_at": "2026-09-09T13:13:48-0600"
+}

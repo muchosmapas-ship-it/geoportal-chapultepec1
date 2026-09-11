@@ -1,0 +1,32 @@
+{
+  "instructions_es": [
+    "1. Levantar servidor local en la carpeta de salida:",
+    "     cd ortofoto_S1\\Parque_Ortofotoseccion1parque",
+    "     python -m http.server 8000",
+    "2. En JOSM: Edit > Preferences > Imagery > + (Custom)",
+    "3. Pegar uno de los url de abajo como 'Tile URL'",
+    "4. Name: 🟢 RGB Parque Libano (S1)",
+    "5. Attribution: Ortofoto UAV — INyDES 2026 — GSD 5cm/px — Parque L\\u00edbano",
+    "6. Max zoom: 19"
+  ],
+  "tile_url_examples": {
+    "local_server": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "static_export": "tiles/{z}/{x}/{y}.png",
+    "github_pages_example": "https://<TU_USUARIO>.github.io/<TU_REPO>/tiles/{z}/{x}/{y}.png"
+  },
+  "josm_preferences_snippet": {
+    "_comment": "Pegar bajo imagery.layers en preferencias de JOSM",
+    "name": "🟢 RGB Parque Libano (S1)",
+    "type": "tms",
+    "url": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "min_zoom": 18,
+    "max_zoom": 19,
+    "attribution": "Ortofoto UAV — INyDES 2026 — GSD 5cm/px — Parque L\\u00edbano",
+    "bbox": {
+      "min_lon": -99.20301956809004,
+      "min_lat": 19.423106920480443,
+      "max_lon": -99.19748235924705,
+      "max_lat": 19.42960102974952
+    }
+  }
+}

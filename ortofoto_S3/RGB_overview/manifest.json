@@ -1,0 +1,41 @@
+{
+  "name": "seccion3",
+  "source": "F:\\INYDES\\Vuelos\\Seccion3\\Corte\\Ortomosaico_Seccion_3_m.jp2",
+  "attribution": "Orto UAV INyDES 2026 S3 - overview 50cm/px",
+  "tile_size": 256,
+  "min_zoom": 13,
+  "max_zoom": 17,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.22642460230996,
+    19.396557935771312,
+    -99.20511334097769,
+    19.419429887243723
+  ],
+  "bbox_3857": [
+    -11045835.059966298,
+    2201680.281644466,
+    -11043462.701206626,
+    2204379.77059185
+  ],
+  "center_4326": [
+    -99.21576897164383,
+    19.407993911507518
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 129,
+    "bytes": 5343387,
+    "per_zoom": {
+      "13": 1,
+      "14": 4,
+      "15": 9,
+      "16": 25,
+      "17": 90
+    },
+    "zmax_natural": 5
+  },
+  "generated_at": "2026-09-11T10:42:25-0600"
+}

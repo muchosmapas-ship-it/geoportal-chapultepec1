@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>🟢 RGB Parque Libano (S1) - Visor de prueba</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .attr { background: rgba(255,255,255,0.8); padding: 2px 6px; font-size: 11px; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var bounds = [[19.423106920480443, -99.20301956809004], [19.42960102974952, -99.19748235924705]];
+  var map = L.map('map', { maxBounds: bounds, maxZoom: 19 });
+  L.tileLayer('./tiles/{z}/{x}/{y}.png', {
+    minZoom: 18,
+    maxZoom: 19,
+    maxNativeZoom: 19,
+    tms: false,
+    attribution: "Ortofoto UAV \u2014 INyDES 2026 \u2014 GSD 5cm/px \u2014 Parque L\\u00edbano"
+  }).addTo(map);
+  map.fitBounds(bounds);
+</script>
+</body>
+</html>

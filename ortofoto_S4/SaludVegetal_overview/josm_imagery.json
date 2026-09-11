@@ -1,0 +1,32 @@
+{
+  "instructions_es": [
+    "1. Levantar servidor local en la carpeta de salida:",
+    "     cd F:\\geoportal_chapultepec\\visor_web_export\\ortofoto_S4\\SaludVegetal_overview",
+    "     python -m http.server 8000",
+    "2. En JOSM: Edit > Preferences > Imagery > + (Custom)",
+    "3. Pegar uno de los url de abajo como 'Tile URL'",
+    "4. Name: salud",
+    "5. Attribution: Salud Vegetal UAV INyDES 2026 S4 - overview 50cm/px",
+    "6. Max zoom: 17"
+  ],
+  "tile_url_examples": {
+    "local_server": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "static_export": "tiles/{z}/{x}/{y}.png",
+    "github_pages_example": "https://<TU_USUARIO>.github.io/<TU_REPO>/tiles/{z}/{x}/{y}.png"
+  },
+  "josm_preferences_snippet": {
+    "_comment": "Pegar bajo imagery.layers en preferencias de JOSM",
+    "name": "salud",
+    "type": "tms",
+    "url": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "min_zoom": 13,
+    "max_zoom": 17,
+    "attribution": "Salud Vegetal UAV INyDES 2026 S4 - overview 50cm/px",
+    "bbox": {
+      "min_lon": -99.23841691327509,
+      "min_lat": 19.386532099042565,
+      "max_lon": -99.22299324785267,
+      "max_lat": 19.394078595325738
+    }
+  }
+}

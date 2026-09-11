@@ -1,0 +1,41 @@
+{
+  "name": "Ortofoto Seccion 3 Ba",
+  "source": "F:\\INYDES\\Vuelos\\Seccion3\\Corte\\Ortomosaico_Seccion_3_Ba.jp2",
+  "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3 Ba",
+  "tile_size": 256,
+  "min_zoom": 15,
+  "max_zoom": 19,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.22848125395201,
+    19.408741360569582,
+    -99.21635130176283,
+    19.428063901136458
+  ],
+  "bbox_3857": [
+    -11046064.00537983,
+    2203118.197416991,
+    -11044713.705278784,
+    2205398.9089770205
+  ],
+  "center_4326": [
+    -99.22241627785742,
+    19.41840263085302
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 768,
+    "bytes": 15916951,
+    "per_zoom": {
+      "15": 6,
+      "16": 15,
+      "17": 45,
+      "18": 144,
+      "19": 558
+    },
+    "zmax_natural": 8
+  },
+  "generated_at": "2026-09-11T08:36:59-0600"
+}

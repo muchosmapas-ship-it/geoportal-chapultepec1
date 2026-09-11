@@ -1,0 +1,32 @@
+"""
+Servidor HTTP simple que envia charset=utf-8 en Content-Type
+para que el navegador muestre correctamente los acentos.
+"""
+import http.server
+import socketserver
+import os
+import sys
+
+PORT = 8000
+DIR = r"F:\geoportal_chapultepec\visor_web_export"
+
+class UTF8Handler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        # Forzar charset=utf-8 en archivos de texto
+        if self.path.endswith(('.html', '.js', '.css', '.json', '.geojson', '.txt')):
+            # Reescribir el Content-Type para incluir charset
+            self._charset_added = True
+        super().end_headers()
+
+    def guess_type(self, path):
+        result = super().guess_type(path)
+        if path.endswith(('.html', '.js', '.css', '.json', '.geojson', '.txt', '.xml')):
+            if result.startswith('text/'):
+                return result + '; charset=utf-8'
+            return 'text/plain; charset=utf-8'
+        return result
+
+os.chdir(DIR)
+print(f"Serving {DIR} at http://127.0.0.1:{PORT}/")
+with socketserver.TCPServer(("127.0.0.1", PORT), UTF8Handler) as httpd:
+    httpd.serve_forever()

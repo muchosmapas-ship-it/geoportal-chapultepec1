@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Ortofoto Seccion 4 - Chapultepec - INyDES 2026</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    html, body, #map { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
+    .info {
+      position: absolute; top: 10px; right: 10px; z-index: 1000;
+      background: rgba(255,255,255,0.95); padding: 12px 14px;
+      border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      max-width: 280px; font-size: 13px;
+    }
+    .info h4 { margin: 0 0 8px 0; font-size: 14px; }
+    .layer-row { display: flex; align-items: center; margin: 4px 0; gap: 6px; }
+    .layer-row label { flex: 1; }
+    .badge { background: #2a7; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; }
+    .attr { background: rgba(255,255,255,0.8); padding: 2px 6px; font-size: 11px; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="info">
+  <h4>📍 Sección 4 — Chapultepec</h4>
+  <div class="layer-row">
+    <input type="radio" name="basemap" id="bm-rgb" value="rgb" checked>
+    <label for="bm-rgb">🟢 Ortofoto RGB <span class="badge">5cm/px</span></label>
+  </div>
+  <div class="layer-row">
+    <input type="radio" name="basemap" id="bm-salud" value="salud">
+    <label for="bm-salud">🌿 Salud Vegetal <span class="badge">5cm/px</span></label>
+  </div>
+  <hr style="margin: 8px 0; border: 0; border-top: 1px solid #ddd;">
+  <div class="layer-row">
+    <input type="checkbox" id="ly-arboles" checked>
+    <label for="ly-arboles">🌳 67,475 árboles (WFS)</label>
+  </div>
+  <div class="layer-row">
+    <input type="checkbox" id="ly-subzonas" checked>
+    <label for="ly-subzonas">🗺️ Subzonas (WFS)</label>
+  </div>
+  <div style="margin-top: 8px; font-size: 11px; color: #666;">
+    Generado para PT Gestión Territorial — INyDES 2026
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Bounds de la seccion 4 (union RGB + SaludVegetal)
+  var bounds = L.latLngBounds([19.3865, -99.2384], [19.3941, -99.2230]);
+  var map = L.map('map', { maxBounds: bounds, maxZoom: 19 });
+  map.fitBounds(bounds);
+
+  // Capa base OSM (solo para orientacion cuando no hay tile de la orto)
+  var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 10, maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  });
+
+  // Ortofoto RGB (cubre z=15..19 en el extent de la seccion 4)
+  var rgb = L.tileLayer('./RGB/tiles/{z}/{x}/{y}.png', {
+    minZoom: 15, maxZoom: 19, maxNativeZoom: 19,
+    attribution: 'Ortofoto UAV — INyDES 2026 — GSD 5cm'
+  });
+
+  // Salud Vegetal
+  var salud = L.tileLayer('./SaludVegetal/tiles/{z}/{x}/{y}.png', {
+    minZoom: 15, maxZoom: 19, maxNativeZoom: 19,
+    attribution: 'Salud Vegetal — INyDES 2026 — GSD 5cm'
+  });
+
+  // Empezamos con RGB
+  rgb.addTo(map);
+
+  // Switcher radio
+  document.querySelectorAll('input[name=basemap]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      map.removeLayer(rgb); map.removeLayer(salud);
+      if (this.value === 'rgb') rgb.addTo(map);
+      else salud.addTo(map);
+    });
+  });
+
+  // (Opcional) Capa de arboles y subzonas - WFS del visor_fa o geojson estatico
+  // Los placeholders se llenaran cuando se integre con visor_fa
+  var lyrGroup = L.layerGroup();
+  lyrGroup.addTo(map);
+
+  // Leyenda
+  var legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = function () {
+    var div = L.DomUtil.create('div', 'attr');
+    div.innerHTML = '<b>Sección 4 - Chapultepec</b><br>' +
+                    'Ortofoto UAV INyDES 2026 · GSD 5cm/px<br>' +
+                    'Bounds: ' + bounds.toBBoxString().slice(0, 60) + '...';
+    return div;
+  };
+  legend.addTo(map);
+</script>
+</body>
+</html>

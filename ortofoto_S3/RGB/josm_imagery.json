@@ -1,0 +1,32 @@
+{
+  "instructions_es": [
+    "1. Levantar servidor local en la carpeta de salida:",
+    "     cd F:\\geoportal_chapultepec\\visor_web_export\\ortofoto_S3\\RGB",
+    "     python -m http.server 8000",
+    "2. En JOSM: Edit > Preferences > Imagery > + (Custom)",
+    "3. Pegar uno de los url de abajo como 'Tile URL'",
+    "4. Name: Ortofoto Seccion 3",
+    "5. Attribution: Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3",
+    "6. Max zoom: 19"
+  ],
+  "tile_url_examples": {
+    "local_server": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "static_export": "tiles/{z}/{x}/{y}.png",
+    "github_pages_example": "https://<TU_USUARIO>.github.io/<TU_REPO>/tiles/{z}/{x}/{y}.png"
+  },
+  "josm_preferences_snippet": {
+    "_comment": "Pegar bajo imagery.layers en preferencias de JOSM",
+    "name": "Ortofoto Seccion 3",
+    "type": "tms",
+    "url": "http://localhost:8000/tiles/{z}/{x}/{y}.png",
+    "min_zoom": 15,
+    "max_zoom": 19,
+    "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3",
+    "bbox": {
+      "min_lon": -99.22642460230996,
+      "min_lat": 19.39655567850673,
+      "max_lon": -99.20511094736194,
+      "max_lat": 19.419429888319502
+    }
+  }
+}

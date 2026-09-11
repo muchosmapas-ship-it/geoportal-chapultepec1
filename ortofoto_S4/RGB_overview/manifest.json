@@ -1,0 +1,41 @@
+{
+  "name": "seccion4",
+  "source": "F:\\INYDES\\Vuelos\\Seccion4\\Ortomosaico\\s4\\Ortomosaico_Seccion_4.tif",
+  "attribution": "Orto UAV INyDES 2026 S4 RGB - overview 50cm/px",
+  "tile_size": 256,
+  "min_zoom": 13,
+  "max_zoom": 17,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.23841691327509,
+    19.386532099042565,
+    -99.22299324785267,
+    19.394078595325738
+  ],
+  "bbox_3857": [
+    -11047170.03791637,
+    2200497.0901164724,
+    -11045453.083335381,
+    2201387.6773767197
+  ],
+  "center_4326": [
+    -99.23070508056388,
+    19.390305347184153
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 52,
+    "bytes": 1751047,
+    "per_zoom": {
+      "13": 4,
+      "14": 4,
+      "15": 4,
+      "16": 12,
+      "17": 28
+    },
+    "zmax_natural": 4
+  },
+  "generated_at": "2026-09-11T10:43:41-0600"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Ortofoto Seccion 2",
+  "source": "F:\\INYDES\\Vuelos\\Seccion2\\corte\\1\\Ortomosaico_seccion2_5cm_u8_clean.tif",
+  "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 2",
+  "tile_size": 256,
+  "min_zoom": 15,
+  "max_zoom": 19,
+  "scheme": "xyz",
+  "format": "png",
+  "bbox_4326": [
+    -99.20573952516816,
+    19.399858036513507,
+    -99.18828604631678,
+    19.42773434973099
+  ],
+  "bbox_3857": [
+    -11043532.407711852,
+    2202069.756478578,
+    -11041589.495333547,
+    2205360.0085218237
+  ],
+  "center_4326": [
+    -99.19701278574246,
+    19.41379619312225
+  ],
+  "crs": "EPSG:3857",
+  "tile_pattern": "{z}/{x}/{y}.png",
+  "stats": {
+    "tiles": 1561,
+    "bytes": 115341496,
+    "per_zoom": {
+      "15": 8,
+      "16": 24,
+      "17": 77,
+      "18": 308,
+      "19": 1144
+    },
+    "zmax_natural": 8
+  },
+  "generated_at": "2026-09-10T17:04:28-0600"
+}
