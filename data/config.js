@@ -40,7 +40,7 @@ window.__CONFIG = {
         },
         "seccion4_overview": {
             "attribution": "Ortofoto UAV INyDES 2026 S4 RGB - overview 50cm/px",
-            "label": "Ortofoto RGB (Seccion 4) (overview)",
+            "label": "Ortofoto Seccion 4 (overview)",
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
@@ -71,28 +71,28 @@ window.__CONFIG = {
             "label": "Ortofoto Seccion 2",
             "type": "xyz",
             "url": "./ortofoto_S2/RGB_clean/tiles/{z}/{x}/{y}.png",
-            "minZoom": 18,
-            "maxZoom": 21
+            "minZoom": 15,
+            "maxZoom": 19
         },
         "seccion3_rgb": {
             "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3",
             "label": "Ortofoto Seccion 3",
             "type": "xyz",
             "url": "./ortofoto_S3/RGB/tiles/{z}/{x}/{y}.png",
-            "minZoom": 18,
-            "maxZoom": 21
+            "minZoom": 15,
+            "maxZoom": 19
         },
         "seccion3_barrilaco_rgb": {
             "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3 Barrilaco",
             "label": "Ortofoto Seccion 3 Barrilaco",
             "type": "xyz",
             "url": "./ortofoto_S3_Ba/RGB/tiles/{z}/{x}/{y}.png",
-            "minZoom": 18,
-            "maxZoom": 21
+            "minZoom": 15,
+            "maxZoom": 19
         },
         "rgb": {
             "attribution": "Ortofoto UAV - INyDES 2026 - GSD 5cm/px",
-            "label": "Ortofoto RGB (Seccion 4)",
+            "label": "Ortofoto Seccion 4",
             "maxZoom": 19,
             "minZoom": 15,
             "type": "xyz",
