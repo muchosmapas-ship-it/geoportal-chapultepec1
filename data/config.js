@@ -151,18 +151,11 @@ window.__CONFIG = {
     "MAX_ZOOM": 21,
     "MIN_ZOOM": 13,
     "OVERLAY_LAYERS": {
-        "arboles": {
-            "cluster": true,
-            "clusterDistance": 50,
-            "label": "67,475 arboles (cluster)",
-            "url": "./data/arboles.geojson?v=17",
-            "visible": true
-        },
         "subzonas": {
             "color": "#1e88e5",
             "label": "Subzonas (188 poligonos)",
             "url": "./data/subzonas.geojson?v=17",
-            "visible": false
+            "visible": true
         }
     },
     "ZOOM": 14
