@@ -71,7 +71,7 @@ window.__CONFIG = {
             "label": "Ortofoto Seccion 2",
             "type": "xyz",
             "url": "./ortofoto_S2/RGB_clean/tiles/{z}/{x}/{y}.png",
-            "minZoom": 15,
+            "minZoom": 13,
             "maxZoom": 19
         },
         "seccion3_rgb": {

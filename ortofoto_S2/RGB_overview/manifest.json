@@ -1,41 +1,27 @@
 {
-  "name": "seccion2",
+  "name": "Ortofoto Seccion 2 Overview",
   "source": "F:\\INYDES\\Vuelos\\Seccion2\\corte\\1\\Ortomosaico_seccion2_5cm_u8_clean.tif",
-  "attribution": "Orto UAV INyDES 2026 S2 - overview 50cm/px",
+  "attribution": "Ortofoto UAV INyDES 2026 S2 - overview 50cm/px",
   "tile_size": 256,
   "min_zoom": 13,
-  "max_zoom": 17,
+  "max_zoom": 19,
   "scheme": "xyz",
   "format": "png",
   "bbox_4326": [
-    -99.20573952516816,
-    19.399857200581053,
-    -99.18828903794609,
-    19.427734346153454
+    -99.20570448443382,
+    19.39985802307193,
+    -99.18831825275412,
+    19.427734349730983
   ],
   "bbox_3857": [
-    -11043532.407711852,
-    2202069.6578216027,
-    -11041589.828360198,
-    2205360.0080995294
+    -11043528.50699515,
+    2202069.754892199,
+    -11041593.080537751,
+    2205360.0085218237
   ],
   "center_4326": [
-    -99.19701428155713,
-    19.413795773367255
+    -99.19701136859396,
+    19.413796186401456
   ],
-  "crs": "EPSG:3857",
-  "tile_pattern": "{z}/{x}/{y}.png",
-  "stats": {
-    "tiles": 112,
-    "bytes": 8059270,
-    "per_zoom": {
-      "13": 1,
-      "14": 2,
-      "15": 8,
-      "16": 24,
-      "17": 77
-    },
-    "zmax_natural": 5
-  },
-  "generated_at": "2026-09-11T10:42:20-0600"
+  "crs": "EPSG:3857"
 }
