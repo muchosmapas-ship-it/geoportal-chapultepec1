@@ -12,7 +12,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S1/RGB_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S1/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
         "seccion2_overview": {
             "attribution": "Ortofoto UAV INyDES 2026 S2 - overview 50cm/px",
@@ -20,7 +20,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S2/RGB_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S2/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
         "seccion3_overview": {
             "attribution": "Ortofoto UAV INyDES 2026 S3 - overview 50cm/px",
@@ -28,7 +28,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S3/RGB_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S3/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
         "seccion3_barrilaco_overview": {
             "attribution": "Ortofoto UAV INyDES 2026 S3 Barrilaco - overview 50cm/px",
@@ -36,7 +36,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S3_Ba/RGB_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S3_Ba/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
         "seccion4_overview": {
             "attribution": "Ortofoto UAV INyDES 2026 S4 RGB - overview 50cm/px",
@@ -44,7 +44,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S4/RGB_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S4/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
         "salud_overview": {
             "attribution": "Salud Vegetal UAV INyDES 2026 S4 - overview 50cm/px",
@@ -52,7 +52,7 @@ window.__CONFIG = {
             "maxZoom": 17,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_S4/SaludVegetal_overview/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S4/SaludVegetal_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
 
         // =====================================================================
@@ -64,13 +64,13 @@ window.__CONFIG = {
             "maxZoom": 19,
             "minZoom": 15,
             "type": "xyz",
-            "url": "./ortofoto_S1/RGB/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S1/RGB/tiles/{z}/{x}/{y}.png?v=75"
         },
         "seccion2_rgb": {
             "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 2",
             "label": "Ortofoto Seccion 2",
             "type": "xyz",
-            "url": "./ortofoto_S2/RGB_clean/tiles/{z}/{x}/{y}.png",
+            "url": "./ortofoto_S2/RGB_clean/tiles/{z}/{x}/{y}.png?v=75",
             "minZoom": 13,
             "maxZoom": 19
         },
@@ -78,7 +78,7 @@ window.__CONFIG = {
             "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3",
             "label": "Ortofoto Seccion 3",
             "type": "xyz",
-            "url": "./ortofoto_S3/RGB/tiles/{z}/{x}/{y}.png",
+            "url": "./ortofoto_S3/RGB/tiles/{z}/{x}/{y}.png?v=75",
             "minZoom": 15,
             "maxZoom": 19
         },
@@ -86,7 +86,7 @@ window.__CONFIG = {
             "attribution": "Ortofoto UAV INyDES 2026 GSD 5cm/px Seccion 3 Barrilaco",
             "label": "Ortofoto Seccion 3 Barrilaco",
             "type": "xyz",
-            "url": "./ortofoto_S3_Ba/RGB/tiles/{z}/{x}/{y}.png",
+            "url": "./ortofoto_S3_Ba/RGB/tiles/{z}/{x}/{y}.png?v=75",
             "minZoom": 15,
             "maxZoom": 19
         },
@@ -96,7 +96,7 @@ window.__CONFIG = {
             "maxZoom": 19,
             "minZoom": 15,
             "type": "xyz",
-            "url": "./ortofoto_S4/RGB/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S4/RGB/tiles/{z}/{x}/{y}.png?v=75"
         },
         "salud": {
             "attribution": "Salud Vegetal UAV - INyDES 2026 - GSD 5cm/px",
@@ -104,7 +104,7 @@ window.__CONFIG = {
             "maxZoom": 19,
             "minZoom": 15,
             "type": "xyz",
-            "url": "./ortofoto_S4/SaludVegetal/tiles/{z}/{x}/{y}.png"
+            "url": "./ortofoto_S4/SaludVegetal/tiles/{z}/{x}/{y}.png?v=75"
         },
         "osm": {
             "attribution": "(c) OpenStreetMap contributors",
@@ -154,7 +154,7 @@ window.__CONFIG = {
         "subzonas": {
             "color": "#1e88e5",
             "label": "Subzonas (188 poligonos)",
-            "url": "./data/subzonas.geojson?v=17",
+            "url": "./data/subzonas.geojson?v=75",
             "visible": false
         }
     },
