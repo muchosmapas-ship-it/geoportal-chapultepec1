@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="bower_components/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v4.6.5/css/ol.css">
     <link rel="stylesheet" href="bower_components/ol.css">
-    <link rel="stylesheet" href="css/style.css?v=75">
+    <link rel="stylesheet" href="css/style.css?v=110">
     <link rel="icon" type="image/png" href="img/favicon.ico">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-primary visor-nav">
+<nav class="navbar navbar-dark visor-nav" style="background: linear-gradient(135deg, #133c2e 0%, #1b4d3e 100%); border-bottom: 2px solid #52b788; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
     <div class="container-fluid">
         <span class="navbar-brand">Geoportal Evaluación del estado del arbolado en Chapultepec</span>
         <span class="text-light small">PT Gestion Territorial - INyDES 2026</span>
@@ -19,42 +19,65 @@
 </nav>
 <div class="visor-container">
     <aside class="visor-sidebar">
-        <section class="card visor-card">
-            <div class="card-header bg-info text-white">Busqueda con autocompletado</div>
-            <div class="card-body">
+        <section class="card visor-card mb-2" style="position: relative; overflow: visible;">
+            <div class="card-header text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #133c2e 0%, #1b4d3e 100%);">
+                <span>🔍 Búsqueda de Subzonas</span>
+            </div>
+            <div class="card-body p-2" style="position: relative;">
                 <input id="search-input" type="text" class="form-control form-control-sm"
-                       placeholder="Buscar subzona, codigo, nombre..."
+                       placeholder="Buscar subzona (ej: 1.1, Gandhi, Tamayo)..."
                        autocomplete="off">
                 <div id="autocomplete" class="autocomplete-list"></div>
                 <div id="select-status" style="font-size:10px;color:#666;margin-top:4px;"></div>
             </div>
         </section>
 
-        <section class="card visor-card">
-            <div class="card-header bg-secondary text-white">Capas</div>
-            <div class="card-body" id="overlay-panel">Cargando...</div>
+        <section class="card visor-card mb-2">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%); font-weight: 600;">Capas</div>
+            <div class="card-body p-2" id="overlay-panel">Cargando...</div>
         </section>
 
-        <section class="card visor-card">
-            <div class="card-header bg-success text-white">Ortomosaico</div>
-            <div class="card-body" id="base-panel">Cargando...</div>
+        <section class="card visor-card mb-2">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%); font-weight: 600;">Ortomosaico</div>
+            <div class="card-body p-2" id="base-panel">Cargando...</div>
         </section>
 
-        <section class="card visor-card">
-            <div class="card-header bg-info text-white">Sugerencias</div>
-            <div class="card-body small">
-                <p class="mb-1">Activa/desactiva capas en <strong>Capas</strong>.</p>
-                <p class="mb-1">Escribe en el buscador para ir a una subzona o filtrar arboles.</p>
-                <p class="mb-0">Click en el mapa para ver detalles de un elemento.</p>
+        <section class="card visor-card mb-2">
+            <div class="card-header text-white py-1 px-2 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%); font-weight: 600; font-size: 0.85rem;">
+                <span>🛠️ Herramientas GIS</span>
+            </div>
+            <div class="card-body p-2" id="gis-tools-panel">
+                <!-- Fila 1: Subir Archivo + Activar GPS -->
+                <div class="d-flex gap-1 mb-1">
+                    <button class="btn btn-sm btn-outline-success w-50 py-1 px-1 fw-semibold text-truncate" id="btn-upload-file" title="Subir KML, Shapefile (.zip) o GeoJSON" style="font-size:0.76rem;">
+                        📁 Subir KML/SHP
+                    </button>
+                    <button class="btn btn-sm btn-outline-success w-50 py-1 px-1 fw-semibold text-truncate" id="btn-gps-panel" title="Activar mi ubicación GPS en tiempo real" style="font-size:0.76rem;">
+                        🎯 Mi GPS
+                    </button>
+                    <input type="file" id="gis-file-input" accept=".kml,.geojson,.json,.zip" style="display:none">
+                </div>
+                <!-- Fila 2: Dibujo (Punto, Línea, Polígono) -->
+                <div class="btn-group btn-group-sm w-100 mb-1" role="group">
+                    <button type="button" class="btn btn-outline-success btn-draw py-0 px-1" data-type="Point" title="Dibujar Punto" style="font-size:0.75rem;">📍 Punto</button>
+                    <button type="button" class="btn btn-outline-success btn-draw py-0 px-1" data-type="LineString" title="Dibujar Línea" style="font-size:0.75rem;">📏 Línea</button>
+                    <button type="button" class="btn btn-outline-success btn-draw py-0 px-1" data-type="Polygon" title="Dibujar Polígono" style="font-size:0.75rem;">🛑 Polígono</button>
+                </div>
+                <!-- Fila 3: Limpiar + Exportar -->
+                <div class="d-flex gap-1 mb-1">
+                    <button class="btn btn-sm btn-outline-danger w-50 py-0 px-1 fw-semibold" id="btn-clear-draw" title="Limpiar todos los dibujos" style="font-size:0.75rem;">🧹 Limpiar</button>
+                    <button class="btn btn-sm btn-outline-primary w-50 py-0 px-1 fw-semibold" id="btn-export-draw" title="Exportar capas a GeoJSON" style="font-size:0.75rem;">💾 Exportar</button>
+                </div>
+                <div id="upload-status" class="text-truncate text-muted" style="font-size:0.70rem; line-height:1.1;"></div>
             </div>
         </section>
 
-        <section class="card visor-card">
-            <div class="card-header bg-light text-dark">Acerca de</div>
-            <div class="card-body small" id="acerca-de">
+        <section class="card visor-card mb-2">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #133c2e 0%, #2d6a4f 100%); font-weight: 600;">Acerca de</div>
+            <div class="card-body small p-2" id="acerca-de">
                 <p class="mb-1"><strong>Bosque de Chapultepec</strong></p>
-                <p class="mb-1">Ortofoto UAV - Vuelo: 2026 ·</p>
-                <p class="mb-0">SEDEMA/ INyDES / UnADM</p>
+                <p class="mb-1">Ortofoto UAV - Vuelo: 2026 🛰️</p>
+                <p class="mb-0">SEDEMA / INyDES / UnADM</p>
             </div>
         </section>
     </aside>
@@ -62,8 +85,8 @@
 </div>
 <div id="info-panel" class="visor-info-panel" hidden>
     <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <span><strong>Informacion del feature</strong></span>
+        <div class="card-header text-white d-flex justify-content-between" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%);">
+            <span><strong>Información del feature</strong></span>
             <button class="btn btn-sm btn-light" id="close-info">x</button>
         </div>
         <div class="card-body" id="info-content">Haz click en una subzona para ver detalles.</div>
@@ -72,7 +95,9 @@
 
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v4.6.5/build/ol.js"></script>
 <script>window.ol || document.write('<script src="bower_components/ol.js"><\/script>')</script>
-<script src="data/config.js?v=75"></script>
-<script src="js/app.js?v=75"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+<script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+<script src="data/config.js?v=110"></script>
+<script src="js/app.js?v=110"></script>
 </body>
 </html>

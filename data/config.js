@@ -153,7 +153,7 @@ window.__CONFIG = {
     "OVERLAY_LAYERS": {
         "subzonas": {
             "color": "#1e88e5",
-            "label": "Subzonas (188 poligonos)",
+            "label": "Subzonas",
             "url": "./data/subzonas.geojson?v=75",
             "visible": false
         }

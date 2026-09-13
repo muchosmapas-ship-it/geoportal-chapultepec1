@@ -1,4 +1,4 @@
-    const customAttribution = `&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors<hr style="margin:6px 0;border-color:rgba(0,0,0,0.15);"><strong style="color:#0d2c54;">Universidad Abierta y a Distancia de México</strong><br><small style="color:#475569;font-weight:600;">DIVISIÓN DE CIENCIAS SOCIALES Y ADMINISTRATIVAS</small><br><strong>Gestión Territorial</strong><br><br><span style="color:#334155;">Análisis integral del estado del arbolado en el Bosque de Chapultepec mediante drones para fortalecer la gestión territorial y la conservación de áreas verdes urbanas</span><br><br><strong style="color:#092240;">EDGAR LÓPEZ PÉREZ</strong> (<a href="mailto:jhonson2490@gmail.com">jhonson2490@gmail.com</a>)`;
+    const customAttribution = `&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors<hr style="margin:6px 0;border-color:rgba(0,0,0,0.15);"><strong style="color:#1b4d3e;">Universidad Abierta y a Distancia de México</strong><br><small style="color:#475569;font-weight:600;">DIVISIÓN DE CIENCIAS SOCIALES Y ADMINISTRATIVAS</small><br><strong>Gestión Territorial</strong><br><br><span style="color:#334155;">Análisis integral del estado del arbolado en el Bosque de Chapultepec mediante drones para fortalecer la gestión territorial y la conservación de áreas verdes urbanas</span><br><br><strong style="color:#133c2e;">EDGAR LÓPEZ PÉREZ</strong> (<a href="mailto:jhonson2490@gmail.com">jhonson2490@gmail.com</a>)`;
 // app.js - Visor estatico del Geoportal Chapultepec
 // OpenLayers 3 + Bootstrap 5, sin build step, sin backend.
 
@@ -118,13 +118,8 @@
 
         const badge = document.getElementById('ortho-mode-badge');
         if (badge) {
-            if (isDetail) {
-                badge.className = 'badge bg-success w-100 p-2 mb-2 text-wrap';
-                badge.innerHTML = `?? <strong>Detalle Activo (5 cm/px)</strong><br><small>Zoom ${zoom.toFixed(1)} - Copas y ramas individuales</small>`;
-            } else {
-                badge.className = 'badge bg-primary w-100 p-2 mb-2 text-wrap';
-                badge.innerHTML = `?? <strong>Panor?mica Activa (50 cm/px)</strong><br><small>Zoom ${zoom.toFixed(1)} - Vista general</small>`;
-            }
+            badge.style.display = 'none';
+            badge.innerHTML = '';
         }
     }
 
@@ -189,7 +184,7 @@
                         text: new ol.style.Text({
                             text: '',  // se asigna en style function
                             font: 'bold 13px sans-serif',
-                            fill: new ol.style.Fill({ color: '#0d2c54' }),
+                            fill: new ol.style.Fill({ color: '#1b4d3e' }),
                             stroke: new ol.style.Stroke({ color: 'rgba(255,255,255,0.85)', width: 3 }),
                             overflow: true,
                             offsetY: 0,
@@ -330,11 +325,11 @@
     const highlightLayer = new ol.layer.Vector({
         source: highlightSource,
         style: new ol.style.Style({
-            fill: new ol.style.Fill({ color: 'rgba(255, 215, 0, 0.35)' }),  // amarillo semi-transparente
-            stroke: new ol.style.Stroke({ color: '#d97706', width: 4 }),
+            fill: new ol.style.Fill({ color: 'rgba(82, 183, 136, 0.40)' }),  // amarillo semi-transparente
+            stroke: new ol.style.Stroke({ color: '#1b4d3e', width: 4 }),
             image: new ol.style.Circle({
                 radius: 10,
-                fill: new ol.style.Fill({ color: 'rgba(255, 215, 0, 0.6)' }),
+                fill: new ol.style.Fill({ color: 'rgba(45, 106, 79, 0.70)' }),
                 stroke: new ol.style.Stroke({ color: '#d97706', width: 3 })
             })
         }),
@@ -399,23 +394,19 @@
     // =====================================================================
     // SIDEBAR: capas base (checkbox), overlays (checkbox), bulk ON/OFF
     // =====================================================================
-    function renderLayersPanel() {
+        function renderLayersPanel() {
         const basePanel = document.getElementById('base-panel');
         if (basePanel) {
             basePanel.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">Mapas base:</small>
-                    <div>
-                        <button class="btn btn-sm btn-link p-0 me-1" id="bases-all-on" title="Prender todas">ON</button>
-                        <button class="btn btn-sm btn-link p-0" id="bases-all-off" title="Apagar todas">OFF</button>
-                    </div>
+                <div class="mb-1">
+                    <small class="text-muted fw-semibold">Mapas base:</small>
                 </div>
                 ${Object.entries(CFG.BASE_LAYERS)
-                    .filter(([n, i]) => !n.endsWith('_overview'))  // ocultar overviews (auto-switch)
+                    .filter(([n, i]) => !n.endsWith('_overview'))
                     .map(([n, i]) => `
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="base-${n}" ${userEnabledBases[n] ? 'checked' : ''}>
-                        <label class="form-check-label" for="base-${n}" style="font-size:0.85rem;cursor:context-menu" data-layer-type="base" data-layer-name="${n}" title="Click derecho: ver tabla">${i.label}</label>
+                        <label class="form-check-label" for="base-${n}" style="font-size:0.85rem;cursor:pointer" data-layer-type="base" data-layer-name="${n}" title="Click derecho para opciones">${escapeHtml(i.label)}</label>
                     </div>`).join('')}
             `;
             basePanel.querySelectorAll('input[id^=base-]').forEach(c => {
@@ -427,35 +418,44 @@
         const ovPanel = document.getElementById('overlay-panel');
         if (ovPanel) {
             ovPanel.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">Capas superpuestas:</small>
-                    <div>
-                        <button class="btn btn-sm btn-link p-0 me-1" id="ovs-all-on" title="Prender todas">ON</button>
-                        <button class="btn btn-sm btn-link p-0" id="ovs-all-off" title="Apagar todas">OFF</button>
-                    </div>
+                <div class="mb-1">
+                    <small class="text-muted fw-semibold">Capas superpuestas:</small>
                 </div>
-                <div id="ortho-mode-badge" class="mb-2"></div>
+                
                 ${Object.entries(CFG.OVERLAY_LAYERS).map(([name, info]) => `
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ov-${name}" ${overlays[name]?.layer.getVisible() ? 'checked' : ''}>
-                        <label class="form-check-label" for="ov-${name}" style="font-size:0.85rem;cursor:context-menu" data-layer-type="overlay" data-layer-name="${name}" title="Click derecho: ver tabla de atributos">${info.label}</label>
-                        ` + (name === 'arboles' ? `<div class="mt-2 p-2 bg-light rounded border" style="font-size:10px; line-height: 1.2;">
-                            <div style="font-weight: bold; margin-bottom: 4px; color: #333;">Concentraci?n de ?rboles:</div>
-                            <div class="d-flex align-items-center justify-content-between text-center">
-                                <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2e7d32;border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">1-20 (puntos)</span></div>
-                                <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(255, 193, 7, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">21-100</span></div>
-                                <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:rgba(255, 152, 0, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">101-500</span></div>
-                                <div><span style="display:inline-block;width:15px;height:15px;border-radius:50%;background:rgba(244, 67, 54, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">501-1.5k</span></div>
-                                <div><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:rgba(183, 28, 28, 0.96);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">&gt;1.5k</span></div>
-                            </div>
-                        </div>` : '') + `
-                    </div>`).join('')}
+                    <div class="d-flex align-items-center justify-content-between my-1 p-1 rounded border-bottom" style="background:rgba(255,255,255,0.7)">
+                        <div class="form-check mb-0 me-2">
+                            <input class="form-check-input" type="checkbox" id="ov-${name}" ${overlays[name]?.layer.getVisible() ? 'checked' : ''}>
+                            <label class="form-check-label fw-semibold" for="ov-${name}" style="font-size:0.85rem;cursor:pointer" data-layer-type="overlay" data-layer-name="${name}" title="Click derecho para opciones">${escapeHtml(info.label)}</label>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary py-0 px-2 btn-open-table" data-layer="${name}" title="Ver tabla de atributos de ${escapeHtml(info.label)}">
+                            📊 Tabla
+                        </button>
+                    </div>
+                    ` + (name === 'arboles' ? `<div class="mt-1 mb-2 p-2 rounded border p-2" style="font-size:10px; line-height: 1.2;">
+                        <div style="font-weight: bold; margin-bottom: 4px; color: #333;">Concentración de árboles:</div>
+                        <div class="d-flex align-items-center justify-content-between text-center">
+                            <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2e7d32;border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">1-20</span></div>
+                            <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(255, 193, 7, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">21-100</span></div>
+                            <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:rgba(255, 152, 0, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">101-500</span></div>
+                            <div><span style="display:inline-block;width:15px;height:15px;border-radius:50%;background:rgba(244, 67, 54, 0.9);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">501-1.5k</span></div>
+                            <div><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:rgba(183, 28, 28, 0.96);border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">&gt;1.5k</span></div>
+                        </div>
+                    </div>` : '')).join('')}
             `;
             ovPanel.querySelectorAll('input[id^=ov-]').forEach(c => {
                 c.addEventListener('change', e => {
                     const name = c.id.replace('ov-', '');
                     const o = overlays[name];
                     if (o) o.layer.setVisible(e.target.checked);
+                });
+            });
+            ovPanel.querySelectorAll('.btn-open-table').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const layerName = btn.dataset.layer;
+                    openBottomPanel(layerName);
                 });
             });
             document.getElementById('ovs-all-on')?.addEventListener('click', () => {
@@ -471,14 +471,24 @@
                 ovPanel.querySelectorAll('input[id^=ov-]').forEach(c => c.checked = false);
             });
         }
-        // Acerca de
-        const acerca = document.getElementById('acerca-de');
-        if (acerca) {
-            acerca.innerHTML = `
-                <p class="mb-1"><strong>Bosque de Chapultepec</strong></p>
-                <p class="mb-1">Ortofoto UAV - Vuelo: 2026 ·</p>
-                <p class="mb-0">SEDEMA/ INyDES / UnADM</p>
-            `;
+
+        document.querySelectorAll('[data-layer-name]').forEach(el => {
+            el.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                const type = el.dataset.layerType || 'overlay';
+                const name = el.dataset.layerName;
+                showLayerContextMenu(e, type, name);
+            });
+        });
+    }
+    // Renderizar paneles de capas inmediatamente al inicio
+    renderLayersPanel();
+
+    let activeContextMenu = null;
+    function hideContextMenu() {
+        if (activeContextMenu) {
+            activeContextMenu.remove();
+            activeContextMenu = null;
         }
     }
     document.addEventListener('click', hideContextMenu);
@@ -570,7 +580,7 @@
     // PANEL INFERIOR: Tabla persistente de atributos
     // =====================================================================
     let bottomPanel = null;
-    let bottomPanelState = { open: false, height: 280, layerName: null, allFeatures: [], cols: [], filter: '', page: 0, sortCol: null, sortDir: 1, layerColor: '#0d2c54', layerLabel: '' };
+    let bottomPanelState = { open: false, height: 280, layerName: null, allFeatures: [], cols: [], filter: '', page: 0, sortCol: null, sortDir: 1, layerColor: '#1b4d3e', layerLabel: '' };
 
     function openBottomPanel(layerName) {
         const o = overlays[layerName];
@@ -584,7 +594,7 @@
         bottomPanelState.layerName = layerName;
         bottomPanelState.allFeatures = features;
         bottomPanelState.layerLabel = info.label || layerName;
-        bottomPanelState.layerColor = info.color || '#0d2c54';
+        bottomPanelState.layerColor = info.color || '#1b4d3e';
         bottomPanelState.filter = '';
         bottomPanelState.page = 0;
         bottomPanelState.sortCol = null;
@@ -729,14 +739,26 @@
         setTimeout(() => map.updateSize(), 220);
     }
 
-    function filteredFor(st) {
-        return st.filter
-            ? st.allFeatures.filter(f => JSON.stringify(getPropsForPanel(f)).toLowerCase().includes(st.filter.toLowerCase()))
-            : st.allFeatures;
+    function getPropsForPanel(f) {
+        const props = f.getProperties ? f.getProperties() : (f.properties || {});
+        const clean = {};
+        for (const k of Object.keys(props)) {
+            if (k === 'geometry' || k.startsWith('_')) continue;
+            clean[k] = props[k];
+        }
+        return clean;
     }
 
-    function getPropsForPanel(f) {
-        return f.getProperties ? f.getProperties() : (f.properties || {});
+    function filteredFor(st) {
+        if (!st.filter) return st.allFeatures;
+        const term = st.filter.toLowerCase();
+        return st.allFeatures.filter(f => {
+            const props = getPropsForPanel(f);
+            return Object.values(props).some(val => {
+                if (val == null) return false;
+                return String(val).toLowerCase().includes(term);
+            });
+        });
     }
 
     function sortForPanel(arr) {
@@ -880,38 +902,94 @@
         .then(d => { searchIndex = d; rebuildIndex(); })
         .catch(e => console.error('[visor] search_index error:', e));
 
-    function setupAutocomplete() {
+        function setupAutocomplete() {
         const input = document.getElementById('search-input');
         const list = document.getElementById('autocomplete');
+        if (!input || !list) return;
 
-        input.addEventListener('input', () => {
-            const q = input.value.toLowerCase().trim();
-            if (q.length < 2 || idxText.length === 0) { list.innerHTML = ''; return; }
+        let activeIndex = -1;
+
+        function renderMatches(q) {
+            if (!q || q.length < 1 || idxText.length === 0) {
+                list.innerHTML = '';
+                list.style.display = 'none';
+                activeIndex = -1;
+                return;
+            }
             const matches = idxText
                 .filter(x => x.lc.includes(q))
-                .slice(0, 15)
+                .slice(0, 20)
                 .map(x => x.item);
+
+            if (matches.length === 0) {
+                list.innerHTML = '<div class="p-2 text-muted small">Sin resultados coincidentes</div>';
+                list.style.display = 'block';
+                activeIndex = -1;
+                return;
+            }
+
             list.innerHTML = matches.map((m, i) => {
-                const extra = m.filter ? ` data-filter='${escape(JSON.stringify(m.filter))}'` : '';
-                return `<div class="autocomplete-item" data-idx="${i}" data-capa="${m.capa}" data-gid="${escape(m.gid)}"${extra}>
-                    <strong>${escape(m.text)}</strong> <small class="text-muted">${escape(m.label || m.capa)}</small>
+                const extra = m.filter ? ` data-filter='${escapeHtml(JSON.stringify(m.filter))}'` : '';
+                const icon = m.capa === 'subzonas' ? '📍' : '🌳';
+                return `<div class="autocomplete-item ${i === activeIndex ? 'active' : ''}" data-idx="${i}" data-capa="${m.capa}" data-gid="${escapeHtml(m.gid)}"${extra}>
+                    <span>${icon} <strong>${escapeHtml(m.text)}</strong></span>
+                    <small class="text-muted d-block" style="font-size:0.75rem;">${escapeHtml(m.label || m.capa)}</small>
                 </div>`;
             }).join('');
+
+            list.style.display = 'block';
+
             list.querySelectorAll('.autocomplete-item').forEach(el => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const filter = el.dataset.filter ? JSON.parse(el.dataset.filter) : null;
                     selectItem(el.dataset.capa, el.dataset.gid, filter);
                 });
             });
+        }
+
+        input.addEventListener('input', () => {
+            const q = input.value.toLowerCase().trim();
+            renderMatches(q);
         });
+
+        input.addEventListener('focus', () => {
+            const q = input.value.toLowerCase().trim();
+            if (q.length >= 1) renderMatches(q);
+        });
+
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const first = list.querySelector('.autocomplete-item');
-                if (first) {
-                    e.preventDefault();
-                    const filter = first.dataset.filter ? JSON.parse(first.dataset.filter) : null;
-                    selectItem(first.dataset.capa, first.dataset.gid, filter);
+            const items = list.querySelectorAll('.autocomplete-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (items.length > 0) {
+                    activeIndex = (activeIndex + 1) % items.length;
+                    items.forEach((it, idx) => it.classList.toggle('active', idx === activeIndex));
+                    items[activeIndex]?.scrollIntoView({ block: 'nearest' });
                 }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (items.length > 0) {
+                    activeIndex = (activeIndex - 1 + items.length) % items.length;
+                    items.forEach((it, idx) => it.classList.toggle('active', idx === activeIndex));
+                    items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const target = activeIndex >= 0 && items[activeIndex] ? items[activeIndex] : items[0];
+                if (target) {
+                    const filter = target.dataset.filter ? JSON.parse(target.dataset.filter) : null;
+                    selectItem(target.dataset.capa, target.dataset.gid, filter);
+                }
+            } else if (e.key === 'Escape') {
+                list.innerHTML = '';
+                list.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !list.contains(e.target)) {
+                list.style.display = 'none';
             }
         });
     }
@@ -921,6 +999,9 @@
         const o = overlays[capa];
         if (!o) { console.warn('overlay', capa, 'no cargada'); return; }
         if (!o.layer.getVisible()) o.layer.setVisible(true);
+
+        const list = document.getElementById('autocomplete');
+        if (list) list.style.display = 'none';
 
         // Caso 1: filtro (arboles por especie / seccion / inventario)
         if (filter && typeof o.features[0]?.get === 'function') {
@@ -938,6 +1019,7 @@
                 map.getView().fit(ext, { padding: [80, 80, 80, 80], maxZoom: 19, duration: 800 });
                 input.value = sample.inventario ? `Inv ${sample.inventario} (${sample.especie || '?'})` : (sample.especie || '');
                 showTreeInfo(matches[0]);
+                highlightFeature(matches[0], capa, sample.inventario);
             } else {
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                 for (const f of matches) {
@@ -960,24 +1042,24 @@
                     renderPanelTable();
                 }
             }
-            document.getElementById('autocomplete').innerHTML = '';
             return;
         }
 
         // Caso 2: subzona (gid = subzona)
-        const key = String(gid);
-        const feat = o.features.find(f =>
-            String(f.get('gid') || '') === key
-            || String(f.get('id') || '') === key
-            || String(f.get('subzona') || '') === key
-        );
+        const key = String(gid).trim().toLowerCase();
+        const feat = o.features.find(f => {
+            const sz = String(f.get('subzona') || '').trim().toLowerCase();
+            const id = String(f.get('gid') || f.get('id') || '').trim().toLowerCase();
+            const nm = String(f.get('nombre') || '').trim().toLowerCase();
+            return sz === key || id === key || nm === key || (key.length > 2 && nm.includes(key));
+        });
         if (feat) {
             const ext = feat.getGeometry().getExtent();
             map.getView().fit(ext, { padding: [60, 60, 60, 60], maxZoom: 17, duration: 800 });
             const input = document.getElementById('search-input');
             input.value = (feat.get('subzona') || '') + ' ' + (feat.get('nombre') || '');
-            document.getElementById('autocomplete').innerHTML = '';
             showSubzonaInfo(feat);
+            highlightFeature(feat, capa, key);
         } else {
             console.warn(`[visor] feature ${capa}/${gid} no encontrado`);
         }
@@ -1326,5 +1408,322 @@
     // }, 2000);
 
     // Exponer para debug
-    window.__visor = { map, baseLayers, overlays, toggleBase, setAllBases };
+    
+    // =====================================================================
+    // HERRAMIENTAS GIS: Dibujar en Mapa y Cargar KML / Shapefile / GeoJSON
+    // =====================================================================
+    const userDrawSource = new ol.source.Vector();
+    const userDrawLayer = new ol.layer.Vector({
+        source: userDrawSource,
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({ color: 'rgba(82, 183, 136, 0.35)' }),
+            stroke: new ol.style.Stroke({ color: '#1b4d3e', width: 3 }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({ color: '#2d6a4f' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 })
+            })
+        }),
+        zIndex: 250
+    });
+    map.addLayer(userDrawLayer);
+    overlays['capa_usuario'] = { layer: userDrawLayer, info: { label: 'Mis Dibujos / Capas Cargadas', color: '#2d6a4f' }, features: [] };
+
+    let drawInteraction = null;
+
+    function saveUserDrawings() {
+        try {
+            const features = userDrawSource.getFeatures();
+            if (features.length === 0) {
+                localStorage.removeItem('visor_chapultepec_drawings');
+                return;
+            }
+            const geojsonStr = new ol.format.GeoJSON().writeFeatures(features, {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:3857'
+            });
+            localStorage.setItem('visor_chapultepec_drawings', geojsonStr);
+            overlays['capa_usuario'].features = features;
+        } catch (e) {
+            console.error('[GIS] Error guardando dibujos:', e);
+        }
+    }
+
+    function loadUserDrawings() {
+        try {
+            const saved = localStorage.getItem('visor_chapultepec_drawings');
+            if (saved) {
+                const features = new ol.format.GeoJSON().readFeatures(saved, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:3857'
+                });
+                userDrawSource.addFeatures(features);
+                overlays['capa_usuario'].features = features;
+                console.log('[GIS] Cargados ' + features.length + ' elementos del localStorage.');
+            }
+        } catch (e) {
+            console.error('[GIS] Error cargando localStorage:', e);
+        }
+    }
+    loadUserDrawings();
+
+    function setDrawMode(type) {
+        if (drawInteraction) map.removeInteraction(drawInteraction);
+        document.querySelectorAll('.btn-draw').forEach(b => b.classList.remove('active', 'bg-success', 'text-white'));
+        if (!type) return;
+
+        const btn = document.querySelector(`.btn-draw[data-type="${type}"]`);
+        if (btn) btn.classList.add('active', 'bg-success', 'text-white');
+
+        drawInteraction = new ol.interaction.Draw({
+            source: userDrawSource,
+            type: type
+        });
+
+        drawInteraction.on('drawend', e => {
+            const feat = e.feature;
+            feat.set('nombre', `Elemento ${type} #${userDrawSource.getFeatures().length + 1}`);
+            feat.set('fecha', new Date().toLocaleString());
+            setTimeout(() => {
+                saveUserDrawings();
+                setDrawMode(null);
+                const ext = feat.getGeometry().getExtent();
+                map.getView().fit(ext, { padding: [80, 80, 80, 80], maxZoom: 18, duration: 600 });
+            }, 50);
+        });
+
+        map.addInteraction(drawInteraction);
+    }
+
+    document.querySelectorAll('.btn-draw').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            if (btn.classList.contains('active')) setDrawMode(null);
+            else setDrawMode(type);
+        });
+    });
+
+    document.getElementById('btn-clear-draw')?.addEventListener('click', () => {
+        if (userDrawSource.getFeatures().length === 0) return;
+        if (confirm('¿Deseas borrar todos los elementos dibujados y cargados?')) {
+            setDrawMode(null);
+            userDrawSource.clear();
+            saveUserDrawings();
+            const status = document.getElementById('upload-status');
+            if (status) status.textContent = 'Dibujos limpiados';
+        }
+    });
+
+    document.getElementById('btn-export-draw')?.addEventListener('click', () => {
+        const features = userDrawSource.getFeatures();
+        if (features.length === 0) {
+            alert('No hay elementos dibujados o cargados para exportar.');
+            return;
+        }
+        const geojsonStr = new ol.format.GeoJSON().writeFeatures(features, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+        });
+        const blob = new Blob([geojsonStr], { type: 'application/json;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `capa_usuario_chapultepec_${new Date().toISOString().slice(0,10)}.geojson`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+
+    // File Upload Handler (.kml, .geojson, .zip Shapefile)
+    const fileInput = document.getElementById('gis-file-input');
+    const uploadBtn = document.getElementById('btn-upload-file');
+    const uploadStatus = document.getElementById('upload-status');
+
+    uploadBtn?.addEventListener('click', () => fileInput?.click());
+
+    fileInput?.addEventListener('change', async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fname = file.name.toLowerCase();
+        if (uploadStatus) uploadStatus.textContent = `Procesando ${file.name}...`;
+
+        try {
+            let features = [];
+            if (fname.endsWith('.kml')) {
+                const text = await file.text();
+                features = new ol.format.KML({ extractStyles: true }).readFeatures(text, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:3857'
+                });
+            } else if (fname.endsWith('.geojson') || fname.endsWith('.json')) {
+                const text = await file.text();
+                features = new ol.format.GeoJSON().readFeatures(text, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:3857'
+                });
+            } else if (fname.endsWith('.zip')) {
+                if (typeof shp !== 'undefined') {
+                    const buffer = await file.arrayBuffer();
+                    const geojson = await shp(buffer);
+                    features = new ol.format.GeoJSON().readFeatures(geojson, {
+                        dataProjection: 'EPSG:4326',
+                        featureProjection: 'EPSG:3857'
+                    });
+                } else {
+                    throw new Error('Librería Shapefile (shp.js) no cargada.');
+                }
+            } else {
+                throw new Error('Formato no soportado. Usa KML, GeoJSON o ZIP (Shapefile).');
+            }
+
+            if (features.length === 0) {
+                throw new Error('No se encontraron elementos válidos en el archivo.');
+            }
+
+            userDrawSource.addFeatures(features);
+            saveUserDrawings();
+
+            const ext = userDrawSource.getExtent();
+            if (ext && isFinite(ext[0])) {
+                map.getView().fit(ext, { padding: [60, 60, 60, 60], maxZoom: 18, duration: 800 });
+            }
+
+            if (uploadStatus) uploadStatus.textContent = `✅ Cargar éxito: ${features.length} elementos`;
+            fileInput.value = '';
+
+        } catch (err) {
+            console.error('[GIS] Error cargando archivo:', err);
+            if (uploadStatus) uploadStatus.textContent = `❌ Error: ${err.message || err}`;
+            alert(`Error al cargar ${file.name}: ${err.message || err}`);
+            fileInput.value = '';
+        }
+    });
+
+
+    
+    // =====================================================================
+    // LOCALIZACION EN TIEMPO REAL (GPS / Geolocalizacion)
+    // =====================================================================
+    const locationSource = new ol.source.Vector();
+    const accuracyFeature = new ol.Feature();
+    const positionFeature = new ol.Feature();
+
+    positionFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 9,
+            fill: new ol.style.Fill({ color: '#1b4d3e' }),
+            stroke: new ol.style.Stroke({ color: '#ffffff', width: 3 })
+        })
+    }));
+
+    accuracyFeature.setStyle(new ol.style.Style({
+        fill: new ol.style.Fill({ color: 'rgba(82, 183, 136, 0.25)' }),
+        stroke: new ol.style.Stroke({ color: 'rgba(45, 106, 79, 0.6)', width: 2 })
+    }));
+
+    locationSource.addFeatures([accuracyFeature, positionFeature]);
+
+    const locationLayer = new ol.layer.Vector({
+        source: locationSource,
+        zIndex: 300
+    });
+    map.addLayer(locationLayer);
+
+    const geolocation = new ol.Geolocation({
+        trackingOptions: {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        },
+        projection: map.getView().getProjection()
+    });
+
+    let gpsActive = false;
+    let followUser = true;
+    let lastPosition = null;
+    const SMOOTHING_FACTOR = 0.35; // Filtro suave de media móvil exponencial para eliminar rebotes GPS
+
+    function smoothCoordinates(raw) {
+        if (!lastPosition) {
+            lastPosition = raw;
+            return raw;
+        }
+        const smoothed = [
+            lastPosition[0] + SMOOTHING_FACTOR * (raw[0] - lastPosition[0]),
+            lastPosition[1] + SMOOTHING_FACTOR * (raw[1] - lastPosition[1])
+        ];
+        lastPosition = smoothed;
+        return smoothed;
+    }
+
+    function toggleGPS() {
+        gpsActive = !gpsActive;
+        geolocation.setTracking(gpsActive);
+
+        const gpsBtn = document.getElementById('gps-btn');
+        const status = document.getElementById('upload-status');
+
+        if (gpsActive) {
+            if (gpsBtn) gpsBtn.classList.add('active');
+            if (status) status.innerHTML = '🎯 <strong>Conectando GPS de Alta Precisión...</strong>';
+        } else {
+            if (gpsBtn) gpsBtn.classList.remove('active');
+            positionFeature.setGeometry(null);
+            accuracyFeature.setGeometry(null);
+            lastPosition = null;
+            if (status) status.textContent = 'GPS desactivado';
+        }
+    }
+
+    geolocation.on('change:position', () => {
+        const rawCoords = geolocation.getPosition();
+        if (rawCoords) {
+            const coords = smoothCoordinates(rawCoords);
+            positionFeature.setGeometry(new ol.geom.Point(coords));
+
+            const lonLat = ol.proj.toLonLat(coords);
+            const latStr = lonLat[1].toFixed(6);
+            const lonStr = lonLat[0].toFixed(6);
+            const accuracy = (geolocation.getAccuracy() || 0).toFixed(1);
+
+            if (followUser) {
+                const targetZoom = accuracy < 15 ? 18.5 : 17;
+                map.getView().animate({
+                    center: coords,
+                    zoom: Math.max(map.getView().getZoom(), targetZoom),
+                    duration: 600
+                });
+            }
+
+            const status = document.getElementById('upload-status');
+            if (status) {
+                status.innerHTML = `🎯 <strong>GPS Máxima Precisión (±${accuracy}m)</strong><br><small style="font-family:monospace; color:#1b4d3e;">Lat: ${latStr}° | Lon: ${lonStr}°</small>`;
+            }
+        }
+    });
+
+    geolocation.on('change:accuracyGeometry', () => {
+        accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    });
+
+    geolocation.on('error', (error) => {
+        console.error('[GPS] Error de geolocalización:', error);
+        alert(`Error al obtener ubicación GPS: ${error.message || 'Sin permiso o señal GPS.'}`);
+        gpsActive = true;
+        toggleGPS();
+    });
+
+    // Agregar botón flotante de GPS sobre el mapa
+    const gpsControlDiv = document.createElement('div');
+    gpsControlDiv.className = 'ol-control-gps ol-unselectable ol-control';
+    gpsControlDiv.innerHTML = `<button id="gps-btn" title="Mi ubicación GPS en tiempo real">🎯</button>`;
+    document.getElementById('map').appendChild(gpsControlDiv);
+
+    document.getElementById('gps-btn')?.addEventListener('click', toggleGPS);
+
+
+    document.getElementById('btn-gps-panel')?.addEventListener('click', toggleGPS);
+
+    window.__visor = { map, baseLayers, overlays, toggleBase, setAllBases, openBottomPanel };
 })();
