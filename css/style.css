@@ -519,8 +519,8 @@ body.attr-panel-active #map {
     position: fixed;
     bottom: 15px;
     right: 20px;
-    width: clamp(520px, 50vw, 900px);
-    max-width: calc(100vw - 320px);
+    width: clamp(680px, 62vw, 1150px);
+    max-width: calc(100vw - 310px);
     background: #133c2e;
     border: 2px solid #10b981;
     border-radius: 12px;
