@@ -1745,9 +1745,8 @@
     let flightVectorSource = null;
     let flightVectorLayer = null;
     let droneMarkerFeature = null;
-
-    
     let cameraFovFeature = null;
+    let lineFeature = null;
 
     // Calcular la geometría del cono de visión focal (FOV) del Dron
     function computeFovPolygon(lon, lat, headingDeg, altMeters) {
@@ -1755,7 +1754,7 @@
         const x0 = origin[0];
         const y0 = origin[1];
         
-        // Alcance focal dinámico ampliado a 135 metros según la altitud del vuelo
+        // Alcance focal dinámico ampliado a ~135 metros según la altitud del vuelo
         const reachMeters = Math.max(85, (altMeters || 50) * 2.4); 
         const latRad = lat * Math.PI / 180;
         const mercatorReach = reachMeters / Math.cos(latRad);
@@ -1781,7 +1780,7 @@
         const mText = Math.round(reachMeters) + 'm';
         return new ol.style.Style({
             fill: new ol.style.Fill({
-                color: 'rgba(0, 255, 136, 0.28)'
+                color: 'rgba(0, 255, 136, 0.32)'
             }),
             stroke: new ol.style.Stroke({
                 color: '#00ff88',
@@ -1789,14 +1788,13 @@
             }),
             text: new ol.style.Text({
                 text: '📐 Cobertura Focal: ' + mText + ' (70°)',
-                font: 'bold 11px Arial, sans-serif',
+                font: 'bold 12px Arial, sans-serif',
                 fill: new ol.style.Fill({ color: '#ffffff' }),
                 stroke: new ol.style.Stroke({ color: '#064e3b', width: 3.5 }),
-                offsetY: 28
+                offsetY: 32
             })
         });
     }
-let lineFeature = null;
 
     // SVG de icono de Dron profesional en verde neón con rotación dinámica
     function createDroneStyle(headingDeg, altMeters) {
@@ -1933,7 +1931,7 @@ let lineFeature = null;
         }));
         flightVectorSource.addFeature(endPoint);
 
-        // Cono de Visión Focal (FOV) de la Cámara (se agrega antes para quedar por debajo del dron)
+        // Cono de Visión Focal (FOV) de la Cámara (se agrega antes del dron para quedar por debajo)
         const initReach = Math.max(85, (data.telemetry[0].alt || 50) * 2.4);
         cameraFovFeature = new ol.Feature({
             geometry: computeFovPolygon(data.telemetry[0].lon, data.telemetry[0].lat, data.telemetry[0].heading, data.telemetry[0].alt)
@@ -1948,9 +1946,9 @@ let lineFeature = null;
         droneMarkerFeature.setStyle(createDroneStyle(data.telemetry[0].heading, data.telemetry[0].alt));
         flightVectorSource.addFeature(droneMarkerFeature);
 
-
         // Ajustar vista del mapa a la trayectoria completa
-        const m = getMap(); if (m) {
+        const m = getMap();
+        if (m) {
             const extent = flightVectorSource.getExtent();
             m.getView().fit(extent, {
                 padding: [60, 60, 60, 60],
@@ -1991,18 +1989,16 @@ let lineFeature = null;
                 cameraFovFeature.setStyle(createFovStyle(curReach));
             }
 
-
             // Actualizar interfaz HUD
             const elTime = document.getElementById('hud-time');
             const elAlt = document.getElementById('hud-alt');
             const elSpeed = document.getElementById('hud-speed');
+            const elFov = document.getElementById('hud-fov');
             const elCoords = document.getElementById('hud-coords');
 
             if (elTime) elTime.textContent = '⏱️ ' + formatSecs(currentTime) + ' / ' + formatSecs(flightTelemetry.duration || 0);
             if (elAlt) elAlt.textContent = '📏 Alt: ' + point.alt.toFixed(1) + 'm';
             if (elSpeed) elSpeed.textContent = '🧭 ' + Math.round(point.heading) + '°';
-            
-            const elFov = document.getElementById('hud-fov');
             if (elFov) elFov.textContent = '📐 Focal: ' + Math.round(Math.max(85, (point.alt || 50) * 2.4)) + 'm';
             if (elCoords) elCoords.textContent = '📍 Lat: ' + point.lat.toFixed(5) + ', Lon: ' + point.lon.toFixed(5);
         }
@@ -2055,7 +2051,6 @@ let lineFeature = null;
         const videoPlayer = document.getElementById('flight-video-player');
         const btnClose = document.getElementById('btn-close-video');
         const btnMin = document.getElementById('btn-minimize-video');
-        const btnCustomVideo = document.getElementById('btn-load-custom-video');
         const btnCenterDrone = document.getElementById('btn-center-drone-map');
 
         if (modal && header) {
@@ -2084,23 +2079,6 @@ let lineFeature = null;
             });
         }
 
-        // Seleccionar archivo MP4 local
-        if (btnCustomVideo && videoInput) {
-            btnCustomVideo.addEventListener('click', () => videoInput.click());
-        }
-
-        if (videoInput && videoPlayer) {
-            videoInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const objectUrl = URL.createObjectURL(file);
-                    videoPlayer.src = objectUrl;
-                    videoPlayer.play().catch(() => {});
-                    console.log('🎥 Video cargado dinámicamente:', file.name);
-                }
-            });
-        }
-
         // Minimizar / Restaurar Ventana
         if (btnMin && modal) {
             btnMin.addEventListener('click', function() {
@@ -2119,13 +2097,16 @@ let lineFeature = null;
         // Centrar mapa en la posición actual del Dron
         if (btnCenterDrone) {
             btnCenterDrone.addEventListener('click', function() {
-                if (droneMarkerFeature && window.map) {
-                    const coord = droneMarkerFeature.getGeometry().getCoordinates();
-                    m.getView().animate({
-                        center: coord,
-                        zoom: 18.5,
-                        duration: 600
-                    });
+                if (droneMarkerFeature) {
+                    const m = getMap();
+                    if (m) {
+                        const coord = droneMarkerFeature.getGeometry().getCoordinates();
+                        m.getView().animate({
+                            center: coord,
+                            zoom: 18.5,
+                            duration: 600
+                        });
+                    }
                 }
             });
         }
@@ -2141,8 +2122,9 @@ let lineFeature = null;
         }
 
         // Clic en la línea de trayectoria en el mapa para saltar al segundo del video
-        const m = getMap(); if (m) {
-            if (m) m.on('singleclick', function(evt) {
+        const m = getMap();
+        if (m) {
+            m.on('singleclick', function(evt) {
                 if (!flightTelemetry || !flightTelemetry.telemetry || !videoPlayer) return;
                 const feature = m.forEachFeatureAtPixel(evt.pixel, f => f);
                 if (feature === lineFeature) {
