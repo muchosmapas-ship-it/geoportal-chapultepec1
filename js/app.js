@@ -1727,3 +1727,366 @@
 
     window.__visor = { map, baseLayers, overlays, toggleBase, setAllBases, openBottomPanel };
 })();
+
+
+/* ==========================================================================
+   MODULO REPRODUCTOR DE VIDEO Y TRAYECTORIA GPS DE DRON EN TIEMPO REAL
+   ========================================================================== */
+
+(function initFlightVideoModule() {
+
+    function getMap() {
+        if (window.__map && typeof window.__map.addLayer === 'function') return window.__map;
+        if (window.__visor && window.__visor.map && typeof window.__visor.map.addLayer === 'function') return window.__visor.map;
+        return null;
+    }
+    
+    let flightTelemetry = null;
+    let flightVectorSource = null;
+    let flightVectorLayer = null;
+    let droneMarkerFeature = null;
+    let lineFeature = null;
+
+    // SVG de icono de Dron profesional en verde neón con rotación dinámica
+    function createDroneStyle(headingDeg, altMeters) {
+        const rad = (headingDeg || 0) * Math.PI / 180;
+        return new ol.style.Style({
+            image: new ol.style.Icon({
+                src: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="18" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981" stroke-width="2"/>
+                        <!-- Aspas del Dron -->
+                        <circle cx="8" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
+                        <circle cx="32" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
+                        <circle cx="8" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
+                        <circle cx="32" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
+                        <!-- Cuerpo central -->
+                        <path d="M12 12 L28 28 M28 12 L12 28" stroke="#ffffff" stroke-width="2.5"/>
+                        <polygon points="20,6 26,20 14,20" fill="#00ff88" stroke="#133c2e" stroke-width="1.5"/>
+                    </svg>
+                `),
+                anchor: [0.5, 0.5],
+                scale: 1.1,
+                rotation: rad
+            }),
+            text: new ol.style.Text({
+                text: '🛸 Dron (' + (altMeters ? altMeters.toFixed(1) + 'm' : '56m') + ')',
+                font: 'bold 12px Arial, sans-serif',
+                fill: new ol.style.Fill({ color: '#ffffff' }),
+                stroke: new ol.style.Stroke({ color: '#133c2e', width: 3 }),
+                offsetY: -26
+            })
+        });
+    }
+
+    // Inicializar capas vectoriales para el mapa de OpenLayers
+    function ensureFlightLayers() {
+        if (!flightVectorSource) {
+            flightVectorSource = new ol.source.Vector();
+            flightVectorLayer = new ol.layer.Vector({
+                source: flightVectorSource,
+                zIndex: 999,
+                title: 'Trayectoria Vuelo Video GPS'
+            });
+
+            const m = getMap(); if (m) { m.addLayer(flightVectorLayer); }
+        }
+    }
+
+    // Cargar datos de telemetría JSON y dibujar trayectoria
+    async function loadFlightTelemetry() {
+        try {
+            ensureFlightLayers();
+            const res = await fetch('data/flight_telemetry.json?v=' + Date.now());
+            if (!res.ok) throw new Error('No se pudo cargar la telemetría predeterminada');
+            flightTelemetry = await res.json();
+            
+            drawTrajectoryOnMap(flightTelemetry);
+            console.log('✅ Telemetría de vuelo cargada:', flightTelemetry.total_points, 'puntos');
+        } catch (err) {
+            console.warn('Carga de telemetría:', err);
+        }
+    }
+
+    // Dibujar la polilínea del vuelo en OpenLayers
+    function drawTrajectoryOnMap(data) {
+        if (!data || !data.telemetry || data.telemetry.length === 0) return;
+        ensureFlightLayers();
+        flightVectorSource.clear();
+
+        const coords = data.telemetry.map(p => ol.proj.fromLonLat([p.lon, p.lat]));
+
+        // Feature Línea de Vuelo
+        lineFeature = new ol.Feature({
+            geometry: new ol.geom.LineString(coords),
+            name: 'Trayectoria Vuelo Video'
+        });
+
+        // Estilo Neon Verde Glowing
+        lineFeature.setStyle([
+            new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(16, 185, 129, 0.4)',
+                    width: 9
+                })
+            }),
+            new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#00ff88',
+                    width: 4
+                })
+            })
+        ]);
+
+        flightVectorSource.addFeature(lineFeature);
+
+        // Marcador Inicio
+        const startPoint = new ol.Feature({
+            geometry: new ol.geom.Point(coords[0])
+        });
+        startPoint.setStyle(new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({ color: '#10b981' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 })
+            }),
+            text: new ol.style.Text({
+                text: '🛫 Inicio',
+                font: 'bold 11px sans-serif',
+                fill: new ol.style.Fill({ color: '#10b981' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }),
+                offsetY: 16
+            })
+        }));
+        flightVectorSource.addFeature(startPoint);
+
+        // Marcador Fin
+        const endPoint = new ol.Feature({
+            geometry: new ol.geom.Point(coords[coords.length - 1])
+        });
+        endPoint.setStyle(new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({ color: '#ef4444' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 })
+            }),
+            text: new ol.style.Text({
+                text: '🛬 Fin',
+                font: 'bold 11px sans-serif',
+                fill: new ol.style.Fill({ color: '#ef4444' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }),
+                offsetY: 16
+            })
+        }));
+        flightVectorSource.addFeature(endPoint);
+
+        // Marcador Dron Móvil
+        droneMarkerFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coords[0])
+        });
+        droneMarkerFeature.setStyle(createDroneStyle(data.telemetry[0].heading, data.telemetry[0].alt));
+        flightVectorSource.addFeature(droneMarkerFeature);
+
+        // Ajustar vista del mapa a la trayectoria completa
+        const m = getMap(); if (m) {
+            const extent = flightVectorSource.getExtent();
+            m.getView().fit(extent, {
+                padding: [60, 60, 60, 60],
+                maxZoom: 19.5,
+                duration: 1000
+            });
+        }
+    }
+
+    // Sincronizar posición del Dron según el tiempo actual del Video
+    function syncDroneWithVideo(currentTime) {
+        if (!flightTelemetry || !flightTelemetry.telemetry || !droneMarkerFeature) return;
+        const pts = flightTelemetry.telemetry;
+
+        // Búsqueda binaria rápida del punto más cercano al timestamp
+        let low = 0, high = pts.length - 1;
+        let idx = 0;
+
+        while (low <= high) {
+            let mid = (low + high) >> 1;
+            if (pts[mid].t <= currentTime) {
+                idx = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        const point = pts[idx];
+        if (point) {
+            const coords = ol.proj.fromLonLat([point.lon, point.lat]);
+            droneMarkerFeature.getGeometry().setCoordinates(coords);
+            droneMarkerFeature.setStyle(createDroneStyle(point.heading, point.alt));
+
+            // Actualizar interfaz HUD
+            const elTime = document.getElementById('hud-time');
+            const elAlt = document.getElementById('hud-alt');
+            const elSpeed = document.getElementById('hud-speed');
+            const elCoords = document.getElementById('hud-coords');
+
+            if (elTime) elTime.textContent = '⏱️ ' + formatSecs(currentTime) + ' / ' + formatSecs(flightTelemetry.duration || 0);
+            if (elAlt) elAlt.textContent = '📏 Alt: ' + point.alt.toFixed(1) + 'm';
+            if (elSpeed) elSpeed.textContent = '🧭 ' + Math.round(point.heading) + '°';
+            if (elCoords) elCoords.textContent = '📍 Lat: ' + point.lat.toFixed(5) + ', Lon: ' + point.lon.toFixed(5);
+        }
+    }
+
+    function formatSecs(s) {
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    // Hacer la ventana de video arrastrable (Drag & Drop)
+    function makeWindowDraggable(modalEl, handleEl) {
+        let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+        if (!handleEl || !modalEl) return;
+
+        handleEl.onmousedown = function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            e.preventDefault();
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        };
+
+        function elementDrag(e) {
+            e.preventDefault();
+            posX = mouseX - e.clientX;
+            posY = mouseY - e.clientY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            modalEl.style.top = (modalEl.offsetTop - posY) + 'px';
+            modalEl.style.left = (modalEl.offsetLeft - posX) + 'px';
+            modalEl.style.bottom = 'auto';
+            modalEl.style.right = 'auto';
+        }
+
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+
+    // Configurar Eventos DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnVideo = document.getElementById('btn-flight-video');
+        const videoInput = document.getElementById('video-file-input');
+        const modal = document.getElementById('flight-video-modal');
+        const header = document.getElementById('video-window-header');
+        const videoPlayer = document.getElementById('flight-video-player');
+        const btnClose = document.getElementById('btn-close-video');
+        const btnMin = document.getElementById('btn-minimize-video');
+        const btnCustomVideo = document.getElementById('btn-load-custom-video');
+        const btnCenterDrone = document.getElementById('btn-center-drone-map');
+
+        if (modal && header) {
+            makeWindowDraggable(modal, header);
+        }
+
+        // Cargar telemetría al iniciar
+        loadFlightTelemetry();
+
+        // Botón principal "Video Vuelo GPS"
+        if (btnVideo) {
+            btnVideo.addEventListener('click', function() {
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.remove('minimized');
+                }
+                if (!flightTelemetry) {
+                    loadFlightTelemetry();
+                }
+                // Si el video no tiene src cargado, intentar cargar por defecto
+                if (videoPlayer && (!videoPlayer.src || videoPlayer.src === '')) {
+                    videoPlayer.src = 'data/video.mp4';
+                }
+            });
+        }
+
+        // Seleccionar archivo MP4 local
+        if (btnCustomVideo && videoInput) {
+            btnCustomVideo.addEventListener('click', () => videoInput.click());
+        }
+
+        if (videoInput && videoPlayer) {
+            videoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const objectUrl = URL.createObjectURL(file);
+                    videoPlayer.src = objectUrl;
+                    videoPlayer.play().catch(() => {});
+                    console.log('🎥 Video cargado dinámicamente:', file.name);
+                }
+            });
+        }
+
+        // Minimizar / Restaurar Ventana
+        if (btnMin && modal) {
+            btnMin.addEventListener('click', function() {
+                modal.classList.toggle('minimized');
+            });
+        }
+
+        // Cerrar Ventana
+        if (btnClose && modal) {
+            btnClose.addEventListener('click', function() {
+                modal.style.display = 'none';
+                if (videoPlayer) videoPlayer.pause();
+            });
+        }
+
+        // Centrar mapa en la posición actual del Dron
+        if (btnCenterDrone) {
+            btnCenterDrone.addEventListener('click', function() {
+                if (droneMarkerFeature && window.map) {
+                    const coord = droneMarkerFeature.getGeometry().getCoordinates();
+                    m.getView().animate({
+                        center: coord,
+                        zoom: 18.5,
+                        duration: 600
+                    });
+                }
+            });
+        }
+
+        // Sincronización en tiempo real del reproductor de video con la marca en el mapa
+        if (videoPlayer) {
+            videoPlayer.addEventListener('timeupdate', function() {
+                syncDroneWithVideo(videoPlayer.currentTime);
+            });
+            videoPlayer.addEventListener('seeked', function() {
+                syncDroneWithVideo(videoPlayer.currentTime);
+            });
+        }
+
+        // Clic en la línea de trayectoria en el mapa para saltar al segundo del video
+        const m = getMap(); if (m) {
+            if (m) m.on('singleclick', function(evt) {
+                if (!flightTelemetry || !flightTelemetry.telemetry || !videoPlayer) return;
+                const feature = m.forEachFeatureAtPixel(evt.pixel, f => f);
+                if (feature === lineFeature) {
+                    const clickCoord = ol.proj.toLonLat(evt.coordinate);
+                    // Buscar punto de telemetría más cercano
+                    let minDistance = Infinity;
+                    let bestTime = 0;
+                    flightTelemetry.telemetry.forEach(p => {
+                        const d = Math.hypot(p.lon - clickCoord[0], p.lat - clickCoord[1]);
+                        if (d < minDistance) {
+                            minDistance = d;
+                            bestTime = p.t;
+                        }
+                    });
+                    videoPlayer.currentTime = bestTime;
+                    if (modal) modal.style.display = 'flex';
+                }
+            });
+        }
+    });
+})();

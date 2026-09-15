@@ -48,6 +48,13 @@
             </div>
             <div class="card-body p-2" id="gis-tools-panel">
                 <!-- Fila 1: Subir Archivo + Activar GPS -->
+                <!-- Fila Video GPS -->
+                <div class="mb-1">
+                    <button class="btn btn-sm btn-success w-100 py-1 px-1 fw-bold text-truncate shadow-sm d-flex align-items-center justify-content-center gap-1" id="btn-flight-video" title="Reproducir video local sincronizado con trayectoria GPS" style="font-size:0.78rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border:none;">
+                        📹 Video Vuelo GPS (Dron)
+                    </button>
+                    <input type="file" id="video-file-input" accept="video/mp4,video/webm,video/mkv,video/mov" style="display:none">
+                </div>
                 <div class="d-flex gap-1 mb-1">
                     <button class="btn btn-sm btn-outline-success w-50 py-1 px-1 fw-semibold text-truncate" id="btn-upload-file" title="Subir KML, Shapefile (.zip) o GeoJSON" style="font-size:0.76rem;">
                         📁 Subir KML/SHP
@@ -99,5 +106,37 @@
 <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
 <script src="data/config.js?v=110"></script>
 <script src="js/app.js?v=110"></script>
+
+<!-- Ventana Flotante del Reproductor de Video de Vuelo Sincronizado -->
+<div id="flight-video-modal" class="flight-video-window" style="display:none;">
+    <div class="flight-video-header" id="video-window-header">
+        <span class="fw-bold d-flex align-items-center gap-1">🛸 Video Vuelo DJI Sincronizado</span>
+        <div class="video-modal-controls d-flex gap-1">
+            <button id="btn-minimize-video" class="btn-video-ctrl" title="Minimizar / Expandir">_</button>
+            <button id="btn-close-video" class="btn-video-ctrl text-danger" title="Cerrar">&times;</button>
+        </div>
+    </div>
+    <div class="flight-video-body" id="video-window-body">
+        <div class="video-container">
+            <video id="flight-video-player" controls preload="metadata">
+                <source src="data/video.mp4" type="video/mp4">
+                Tu navegador no soporta el reproductor de video HTML5.
+            </video>
+        </div>
+        <div class="video-telemetry-hud p-2">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span id="hud-time" class="badge bg-dark font-monospace" style="font-size:0.75rem;">⏱️ 00:00 / 00:00</span>
+                <span id="hud-alt" class="badge bg-success font-monospace" style="font-size:0.75rem;">📏 Alt: 0.0m</span>
+                <span id="hud-speed" class="badge bg-info text-dark font-monospace" style="font-size:0.75rem;">🧭 0.0°</span>
+            </div>
+            <div class="text-truncate text-muted font-monospace" id="hud-coords" style="font-size:0.70rem;">📍 Lat: --, Lon: --</div>
+        </div>
+    </div>
+    <div class="flight-video-footer p-2 d-flex justify-content-between align-items-center gap-1">
+        <button id="btn-load-custom-video" class="btn btn-xs btn-outline-success fw-semibold" style="font-size:0.72rem;">📁 Cargar Video Local (.mp4)</button>
+        <button id="btn-center-drone-map" class="btn btn-xs btn-success fw-semibold" style="font-size:0.72rem;">🎯 Centrar en Dron</button>
+    </div>
+</div>
+
 </body>
 </html>
