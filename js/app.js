@@ -1745,6 +1745,49 @@
     let flightVectorSource = null;
     let flightVectorLayer = null;
     let droneMarkerFeature = null;
+
+    let cameraFovFeature = null;
+
+    // Calcular la geometría del cono de visión focal (FOV) del Dron
+    function computeFovPolygon(lon, lat, headingDeg, altMeters) {
+        const origin = ol.proj.fromLonLat([lon, lat]);
+        const x0 = origin[0];
+        const y0 = origin[1];
+        
+        // Alcance focal dinámico según la altitud del vuelo (~35 a 65 metros)
+        const reachMeters = Math.max(30, (altMeters || 50) * 0.85);
+        const latRad = lat * Math.PI / 180;
+        const mercatorReach = reachMeters / Math.cos(latRad);
+        
+        const fovAngle = 70; // Ángulo de apertura de la cámara (70°)
+        const startAngle = headingDeg - fovAngle / 2;
+        const endAngle = headingDeg + fovAngle / 2;
+        
+        const ring = [[x0, y0]];
+        const steps = 9;
+        for (let i = 0; i <= steps; i++) {
+            const deg = startAngle + (endAngle - startAngle) * (i / steps);
+            // Convertir rumbo geográfico (0=Norte, 90=Este) a radianes cartesianos
+            const rad = (90 - deg) * Math.PI / 180;
+            const x = x0 + mercatorReach * Math.cos(rad);
+            const y = y0 + mercatorReach * Math.sin(rad);
+            ring.push([x, y]);
+        }
+        ring.push([x0, y0]);
+        return new ol.geom.Polygon([ring]);
+    }
+
+    const fovStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 255, 136, 0.25)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: '#00ff88',
+            width: 2,
+            lineDash: [4, 4]
+        })
+    });
+
     let lineFeature = null;
 
     // SVG de icono de Dron profesional en verde neón con rotación dinámica
@@ -1887,6 +1930,14 @@
         droneMarkerFeature.setStyle(createDroneStyle(data.telemetry[0].heading, data.telemetry[0].alt));
         flightVectorSource.addFeature(droneMarkerFeature);
 
+        // Cono de Visión Focal (FOV) de la Cámara
+        cameraFovFeature = new ol.Feature({
+            geometry: computeFovPolygon(data.telemetry[0].lon, data.telemetry[0].lat, data.telemetry[0].heading, data.telemetry[0].alt)
+        });
+        cameraFovFeature.setStyle(fovStyle);
+        flightVectorSource.addFeature(cameraFovFeature);
+
+
         // Ajustar vista del mapa a la trayectoria completa
         const m = getMap(); if (m) {
             const extent = flightVectorSource.getExtent();
@@ -1922,6 +1973,11 @@
             const coords = ol.proj.fromLonLat([point.lon, point.lat]);
             droneMarkerFeature.getGeometry().setCoordinates(coords);
             droneMarkerFeature.setStyle(createDroneStyle(point.heading, point.alt));
+
+            if (cameraFovFeature) {
+                cameraFovFeature.setGeometry(computeFovPolygon(point.lon, point.lat, point.heading, point.alt));
+            }
+
 
             // Actualizar interfaz HUD
             const elTime = document.getElementById('hud-time');
