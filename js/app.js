@@ -1755,7 +1755,7 @@
         const y0 = origin[1];
         
         // Alcance focal dinámico según la altitud del vuelo (~35 a 65 metros)
-        const reachMeters = Math.max(30, (altMeters || 50) * 0.85);
+        const reachMeters = Math.max(85, (altMeters || 50) * 2.4); // Distancia focal alargada a ~135 metros
         const latRad = lat * Math.PI / 180;
         const mercatorReach = reachMeters / Math.cos(latRad);
         
@@ -1779,7 +1779,7 @@
 
     const fovStyle = new ol.style.Style({
         fill: new ol.style.Fill({
-            color: 'rgba(0, 255, 136, 0.25)'
+            color: 'rgba(0, 255, 136, 0.32)'
         }),
         stroke: new ol.style.Stroke({
             color: '#00ff88',
