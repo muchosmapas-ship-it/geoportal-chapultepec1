@@ -517,9 +517,10 @@ body.attr-panel-active #map {
    ========================================================================== */
 .flight-video-window {
     position: fixed;
-    bottom: 20px;
+    bottom: 15px;
     right: 20px;
-    width: 440px;
+    width: clamp(520px, 50vw, 900px);
+    max-width: calc(100vw - 320px);
     background: #133c2e;
     border: 2px solid #10b981;
     border-radius: 12px;
