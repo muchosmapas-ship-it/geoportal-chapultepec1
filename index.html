@@ -20,7 +20,7 @@
 <div class="visor-container">
     <aside class="visor-sidebar">
         <section class="card visor-card mb-2" style="position: relative; overflow: visible;">
-            <div class="card-header text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #133c2e 0%, #1b4d3e 100%);">
+            <div class="card-header text-white d-flex align-items-center justify-content-end" style="background: linear-gradient(135deg, #133c2e 0%, #1b4d3e 100%);">
                 <span>🔍 Búsqueda de Subzonas</span>
             </div>
             <div class="card-body p-2" style="position: relative;">
@@ -43,7 +43,7 @@
         </section>
 
         <section class="card visor-card mb-2">
-            <div class="card-header text-white py-1 px-2 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%); font-weight: 600; font-size: 0.85rem;">
+            <div class="card-header text-white py-1 px-2 d-flex align-items-center justify-content-end" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%); font-weight: 600; font-size: 0.85rem;">
                 <span>🛠️ Herramientas GIS</span>
             </div>
             <div class="card-body p-2" id="gis-tools-panel">
@@ -92,7 +92,7 @@
 </div>
 <div id="info-panel" class="visor-info-panel" hidden>
     <div class="card">
-        <div class="card-header text-white d-flex justify-content-between" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%);">
+        <div class="card-header text-white d-flex justify-content-end" style="background: linear-gradient(135deg, #1b4d3e 0%, #2d6a4f 100%);">
             <span><strong>Información del feature</strong></span>
             <button class="btn btn-sm btn-light" id="close-info">x</button>
         </div>
@@ -124,7 +124,7 @@
             </video>
         </div>
         <div class="video-telemetry-hud p-2">
-            <div class="d-flex justify-content-between align-items-center mb-1">
+            <div class="d-flex justify-content-end align-items-center mb-1">
                 <span id="hud-time" class="badge bg-dark font-monospace" style="font-size:0.75rem;">⏱️ 00:00 / 00:00</span>
                 <span id="hud-alt" class="badge bg-success font-monospace" style="font-size:0.75rem;">📏 Alt: 0.0m</span>
                 <span id="hud-speed" class="badge bg-info text-dark font-monospace" style="font-size:0.75rem;">🧭 0.0°</span>
@@ -132,8 +132,8 @@
             <div class="text-truncate text-muted font-monospace" id="hud-coords" style="font-size:0.70rem;">📍 Lat: --, Lon: --</div>
         </div>
     </div>
-    <div class="flight-video-footer p-2 d-flex justify-content-between align-items-center gap-1">
-        <button id="btn-load-custom-video" class="btn btn-xs btn-outline-success fw-semibold" style="font-size:0.72rem;">📁 Cargar Video Local (.mp4)</button>
+    <div class="flight-video-footer p-2 d-flex justify-content-end align-items-center gap-1">
+        
         <button id="btn-center-drone-map" class="btn btn-xs btn-success fw-semibold" style="font-size:0.72rem;">🎯 Centrar en Dron</button>
     </div>
 </div>
