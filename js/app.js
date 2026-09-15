@@ -1839,8 +1839,10 @@ let lineFeature = null;
                 zIndex: 999,
                 title: 'Trayectoria Vuelo Video GPS'
             });
-
-            const m = getMap(); if (m) { m.addLayer(flightVectorLayer); }
+        }
+        const m = getMap();
+        if (m && flightVectorLayer && !m.getLayers().getArray().includes(flightVectorLayer)) {
+            m.addLayer(flightVectorLayer);
         }
     }
 
@@ -2070,11 +2072,13 @@ let lineFeature = null;
                     modal.style.display = 'flex';
                     modal.classList.remove('minimized');
                 }
+                ensureFlightLayers();
                 if (!flightTelemetry) {
                     loadFlightTelemetry();
+                } else {
+                    drawTrajectoryOnMap(flightTelemetry);
                 }
-                // Si el video no tiene src cargado, intentar cargar por defecto
-                if (videoPlayer && (!videoPlayer.src || videoPlayer.src === '')) {
+                if (videoPlayer && (!videoPlayer.src || videoPlayer.src === '' || videoPlayer.src.endsWith('/'))) {
                     videoPlayer.src = 'data/video.mp4';
                 }
             });
