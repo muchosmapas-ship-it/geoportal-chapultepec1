@@ -1746,6 +1746,7 @@
     let flightVectorLayer = null;
     let droneMarkerFeature = null;
 
+    
     let cameraFovFeature = null;
 
     // Calcular la geometría del cono de visión focal (FOV) del Dron
@@ -1754,8 +1755,8 @@
         const x0 = origin[0];
         const y0 = origin[1];
         
-        // Alcance focal dinámico según la altitud del vuelo (~35 a 65 metros)
-        const reachMeters = Math.max(85, (altMeters || 50) * 2.4); // Distancia focal alargada a ~135 metros
+        // Alcance focal dinámico ampliado a 135 metros según la altitud del vuelo
+        const reachMeters = Math.max(85, (altMeters || 50) * 2.4); 
         const latRad = lat * Math.PI / 180;
         const mercatorReach = reachMeters / Math.cos(latRad);
         
@@ -1764,10 +1765,9 @@
         const endAngle = headingDeg + fovAngle / 2;
         
         const ring = [[x0, y0]];
-        const steps = 9;
+        const steps = 11;
         for (let i = 0; i <= steps; i++) {
             const deg = startAngle + (endAngle - startAngle) * (i / steps);
-            // Convertir rumbo geográfico (0=Norte, 90=Este) a radianes cartesianos
             const rad = (90 - deg) * Math.PI / 180;
             const x = x0 + mercatorReach * Math.cos(rad);
             const y = y0 + mercatorReach * Math.sin(rad);
@@ -1777,18 +1777,26 @@
         return new ol.geom.Polygon([ring]);
     }
 
-    const fovStyle = new ol.style.Style({
-        fill: new ol.style.Fill({
-            color: 'rgba(0, 255, 136, 0.32)'
-        }),
-        stroke: new ol.style.Stroke({
-            color: '#00ff88',
-            width: 2,
-            lineDash: [4, 4]
-        })
-    });
-
-    let lineFeature = null;
+    function createFovStyle(reachMeters) {
+        const mText = Math.round(reachMeters) + 'm';
+        return new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(0, 255, 136, 0.28)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#00ff88',
+                width: 2.5
+            }),
+            text: new ol.style.Text({
+                text: '📐 Cobertura Focal: ' + mText + ' (70°)',
+                font: 'bold 11px Arial, sans-serif',
+                fill: new ol.style.Fill({ color: '#ffffff' }),
+                stroke: new ol.style.Stroke({ color: '#064e3b', width: 3.5 }),
+                offsetY: 28
+            })
+        });
+    }
+let lineFeature = null;
 
     // SVG de icono de Dron profesional en verde neón con rotación dinámica
     function createDroneStyle(headingDeg, altMeters) {
@@ -1923,19 +1931,20 @@
         }));
         flightVectorSource.addFeature(endPoint);
 
+        // Cono de Visión Focal (FOV) de la Cámara (se agrega antes para quedar por debajo del dron)
+        const initReach = Math.max(85, (data.telemetry[0].alt || 50) * 2.4);
+        cameraFovFeature = new ol.Feature({
+            geometry: computeFovPolygon(data.telemetry[0].lon, data.telemetry[0].lat, data.telemetry[0].heading, data.telemetry[0].alt)
+        });
+        cameraFovFeature.setStyle(createFovStyle(initReach));
+        flightVectorSource.addFeature(cameraFovFeature);
+
         // Marcador Dron Móvil
         droneMarkerFeature = new ol.Feature({
             geometry: new ol.geom.Point(coords[0])
         });
         droneMarkerFeature.setStyle(createDroneStyle(data.telemetry[0].heading, data.telemetry[0].alt));
         flightVectorSource.addFeature(droneMarkerFeature);
-
-        // Cono de Visión Focal (FOV) de la Cámara
-        cameraFovFeature = new ol.Feature({
-            geometry: computeFovPolygon(data.telemetry[0].lon, data.telemetry[0].lat, data.telemetry[0].heading, data.telemetry[0].alt)
-        });
-        cameraFovFeature.setStyle(fovStyle);
-        flightVectorSource.addFeature(cameraFovFeature);
 
 
         // Ajustar vista del mapa a la trayectoria completa
@@ -1975,7 +1984,9 @@
             droneMarkerFeature.setStyle(createDroneStyle(point.heading, point.alt));
 
             if (cameraFovFeature) {
+                const curReach = Math.max(85, (point.alt || 50) * 2.4);
                 cameraFovFeature.setGeometry(computeFovPolygon(point.lon, point.lat, point.heading, point.alt));
+                cameraFovFeature.setStyle(createFovStyle(curReach));
             }
 
 
@@ -1988,6 +1999,9 @@
             if (elTime) elTime.textContent = '⏱️ ' + formatSecs(currentTime) + ' / ' + formatSecs(flightTelemetry.duration || 0);
             if (elAlt) elAlt.textContent = '📏 Alt: ' + point.alt.toFixed(1) + 'm';
             if (elSpeed) elSpeed.textContent = '🧭 ' + Math.round(point.heading) + '°';
+            
+            const elFov = document.getElementById('hud-fov');
+            if (elFov) elFov.textContent = '📐 Focal: ' + Math.round(Math.max(85, (point.alt || 50) * 2.4)) + 'm';
             if (elCoords) elCoords.textContent = '📍 Lat: ' + point.lat.toFixed(5) + ', Lon: ' + point.lon.toFixed(5);
         }
     }
