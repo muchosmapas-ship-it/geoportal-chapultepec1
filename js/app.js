@@ -1993,7 +1993,7 @@
         // Cargar telemetría al iniciar
         loadFlightTelemetry();
 
-        // Botón principal "Video Vuelo GPS"
+        // Botón principal "Vuelo inspección"
         if (btnVideo) {
             btnVideo.addEventListener('click', function() {
                 if (modal) {
