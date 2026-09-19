@@ -9,7 +9,7 @@ window.__CONFIG = {
             "maxZoom": 18,
             "minZoom": 13,
             "type": "xyz",
-            "url": "./ortofoto_VARI/tiles/{z}/{x}/{y}.png?v=76"
+            "url": "./ortofoto_VARI/tiles/{z}/{x}/{y}.png?v=77"
         },
         // =====================================================================
         // OVERVIEW (50cm/px) - z=13..17 - "ver TODO Chapultepec"
