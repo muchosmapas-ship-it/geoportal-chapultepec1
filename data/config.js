@@ -104,7 +104,7 @@ window.__CONFIG = {
             "type": "osm"
         }
     },
-    "CENTER": [-99.197, 19.414],
+    "CENTER": [-99.2072, 19.4081],
     "DEFAULT_BASE_LAYERS": [
         "vari",
         "seccion1_overview",
@@ -149,5 +149,5 @@ window.__CONFIG = {
             "visible": false
         }
     },
-    "ZOOM": 14
+    "ZOOM": 13.6
 };

@@ -30,6 +30,26 @@
     });
     console.log('[visor] iniciando');
 
+    // Centrado inteligente para visualizar todo el ortomosaico de Chapultepec (Secciones 1 a 4)
+    function fitWholeChapultepec(duration = 0) {
+        const ext = ol.proj.transformExtent(
+            CFG.EXTENTS?.all_subzonas || [-99.23842, 19.38653, -99.17593, 19.42973],
+            'EPSG:4326',
+            'EPSG:3857'
+        );
+        const sidebarEl = document.getElementById('sidebar');
+        const padLeft = (sidebarEl && sidebarEl.offsetWidth > 0) ? sidebarEl.offsetWidth + 30 : 40;
+        map.getView().fit(ext, {
+            padding: [30, 40, 30, padLeft],
+            duration: duration
+        });
+    }
+
+    // Centrar automáticamente en todo el ortomosaico al inicio
+    setTimeout(() => fitWholeChapultepec(0), 100);
+    setTimeout(() => fitWholeChapultepec(0), 500);
+    document.getElementById('btn-center-ortho')?.addEventListener('click', () => fitWholeChapultepec(600));
+
     // =====================================================================
     // CAPAS BASE: orden de render y conmutacion inteligente 50cm <-> 5cm
     //   - OSM primero (queda al fondo, zIndex=1)
@@ -592,8 +612,7 @@
         }
         // Tile sources (XYZ/OSM) no dan extent preciso, usamos el extent global
         if (src instanceof ol.source.XYZ || src instanceof ol.source.OSM) {
-            map.getView().setCenter(ol.proj.fromLonLat(CFG.CENTER));
-            map.getView().setZoom(CFG.MIN_ZOOM + 2);
+            fitWholeChapultepec(600);
             return;
         }
         const ext = src.getExtent && src.getExtent();
@@ -1977,16 +1996,7 @@
         droneMarkerFeature.setStyle(droneStyle);
         flightVectorSource.addFeature(droneMarkerFeature);
 
-        // Ajustar vista del mapa a la trayectoria completa
-        const m = getMap();
-        if (m) {
-            const extent = flightVectorSource.getExtent();
-            m.getView().fit(extent, {
-                padding: [60, 60, 60, 60],
-                maxZoom: 19.5,
-                duration: 1000
-            });
-        }
+        // Solo renderizar la trayectoria sin forzar zoom para mantener vista completa del ortomosaico
     }
 
     // Sincronizar posición del Dron según el tiempo actual del Video
@@ -2108,6 +2118,17 @@
                 } else {
                     drawTrajectoryOnMap(flightTelemetry);
                 }
+                // Centrar en la trayectoria del vuelo al abrir la herramienta
+                setTimeout(() => {
+                    const m = getMap();
+                    if (m && flightVectorSource && flightVectorSource.getFeatures().length > 0) {
+                        m.getView().fit(flightVectorSource.getExtent(), {
+                            padding: [60, 60, 60, 60],
+                            maxZoom: 19.5,
+                            duration: 800
+                        });
+                    }
+                }, 200);
                 if (videoPlayer && (!videoPlayer.src || videoPlayer.src === '' || videoPlayer.src.endsWith('/'))) {
                     videoPlayer.src = 'data/video.mp4';
                 }
