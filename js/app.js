@@ -37,6 +37,14 @@
     //   - Detalle (5cm/px, zIndex=20, activo en zoom >= 17.5)
     // =====================================================================
     const baseLayers = {};
+        const DRONE_ORTHO_KEYS = [
+        'seccion1_rgb', 'seccion1_overview',
+        'seccion2_rgb', 'seccion2_overview',
+        'seccion3_rgb', 'seccion3_overview',
+        'seccion3_barrilaco_rgb', 'seccion3_barrilaco_overview',
+        'rgb', 'seccion4_overview'
+    ];
+
     const userEnabledBases = {};
     const defaultList = CFG.DEFAULT_BASE_LAYERS || ['osm', 'rgb'];
     const DETAIL_ZOOM_THRESHOLD = 17.5; // Punto de corte entre Panoramica 50cm y Detalle 5cm
@@ -48,7 +56,7 @@
         ['seccion3_rgb', 'seccion3_overview'],
         ['seccion3_barrilaco_rgb', 'seccion3_barrilaco_overview'],
         ['rgb', 'seccion4_overview'],
-        ['salud', 'salud_overview'],
+        
     ];
     const DETAIL_TO_OVERVIEW = {};
     const OVERVIEW_TO_DETAIL = {};
@@ -82,8 +90,11 @@
         } else if (info.type === 'xyz') {
             const isOverview = name.endsWith('_overview');
             zIndex = isOverview ? 10 : 20;
-            const maxZ = isOverview ? 17 : 19;
-            const minZ = isOverview ? 13 : 15;
+            const maxZ = info.maxZoom || (isOverview ? 17 : 19);
+            const minZ = info.minZoom || (isOverview ? 13 : 15);
+            if (name === 'vari') {
+                zIndex = 25;
+            }
             source = new ol.source.XYZ({
                 url: info.url,
                 minZoom: minZ,
@@ -112,6 +123,9 @@
                 baseLayers[detailName].setVisible(enabled && isDetail);
             }
         }
+        if (baseLayers['vari']) {
+            baseLayers['vari'].setVisible(!!userEnabledBases['vari']);
+        }
         if (baseLayers['osm']) {
             baseLayers['osm'].setVisible(!!userEnabledBases['osm']);
         }
@@ -127,12 +141,18 @@
     map.on('moveend', syncBaseLayersVisibility);
 
     function toggleBase(name, on) {
-        userEnabledBases[name] = on;
-        const overview = DETAIL_TO_OVERVIEW[name];
-        if (overview) {
-            userEnabledBases[overview] = on;
-        } else if (OVERVIEW_TO_DETAIL[name]) {
-            userEnabledBases[OVERVIEW_TO_DETAIL[name]] = on;
+        if (name === 'ortomosaico') {
+            for (const k of DRONE_ORTHO_KEYS) {
+                userEnabledBases[k] = on;
+            }
+        } else {
+            userEnabledBases[name] = on;
+            const overview = DETAIL_TO_OVERVIEW[name];
+            if (overview) {
+                userEnabledBases[overview] = on;
+            } else if (OVERVIEW_TO_DETAIL[name]) {
+                userEnabledBases[OVERVIEW_TO_DETAIL[name]] = on;
+            }
         }
         syncBaseLayersVisibility();
     }
@@ -397,17 +417,23 @@
         function renderLayersPanel() {
         const basePanel = document.getElementById('base-panel');
         if (basePanel) {
+            const isOrthoOn = DRONE_ORTHO_KEYS.some(k => userEnabledBases[k]);
             basePanel.innerHTML = `
                 <div class="mb-1">
                     <small class="text-muted fw-semibold">Mapas base:</small>
                 </div>
-                ${Object.entries(CFG.BASE_LAYERS)
-                    .filter(([n, i]) => !n.endsWith('_overview'))
-                    .map(([n, i]) => `
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="base-${n}" ${userEnabledBases[n] ? 'checked' : ''}>
-                        <label class="form-check-label" for="base-${n}" style="font-size:0.85rem;cursor:pointer" data-layer-type="base" data-layer-name="${n}" title="Click derecho para opciones">${escapeHtml(i.label)}</label>
-                    </div>`).join('')}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="base-vari" ${userEnabledBases['vari'] ? 'checked' : ''}>
+                    <label class="form-check-label" for="base-vari" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="vari">Salud vegetal (VARI)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="base-ortomosaico" ${isOrthoOn ? 'checked' : ''}>
+                    <label class="form-check-label" for="base-ortomosaico" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="ortomosaico">Ortomosaico</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="base-osm" ${userEnabledBases['osm'] ? 'checked' : ''}>
+                    <label class="form-check-label" for="base-osm" style="font-size:0.85rem;cursor:pointer" data-layer-type="base" data-layer-name="osm">Mapa base - OpenStreetMap</label>
+                </div>
             `;
             basePanel.querySelectorAll('input[id^=base-]').forEach(c => {
                 c.addEventListener('change', e => toggleBase(e.target.id.replace('base-',''), e.target.checked));
@@ -1748,6 +1774,57 @@
     let cameraFovFeature = null;
     let lineFeature = null;
 
+    // Icono SVG reutilizable para el Dron
+    const droneIcon = new ol.style.Icon({
+        src: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+                <circle cx="20" cy="20" r="18" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981" stroke-width="2"/>
+                <circle cx="8" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
+                <circle cx="32" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
+                <circle cx="8" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
+                <circle cx="32" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
+                <path d="M12 12 L28 28 M28 12 L12 28" stroke="#ffffff" stroke-width="2.5"/>
+                <polygon points="20,6 26,20 14,20" fill="#00ff88" stroke="#133c2e" stroke-width="1.5"/>
+            </svg>
+        `),
+        anchor: [0.5, 0.5],
+        scale: 1.1,
+        rotation: 0
+    });
+
+    const droneText = new ol.style.Text({
+        text: '🛸 Dron (56m)',
+        font: 'bold 12px Arial, sans-serif',
+        fill: new ol.style.Fill({ color: '#ffffff' }),
+        stroke: new ol.style.Stroke({ color: '#133c2e', width: 3 }),
+        offsetY: -26
+    });
+
+    const droneStyle = new ol.style.Style({
+        image: droneIcon,
+        text: droneText
+    });
+
+    // Estilo reutilizable para el Cono de Visión Focal (FOV 135m)
+    const fovText = new ol.style.Text({
+        text: '📐 Cobertura Focal: 135m (70°)',
+        font: 'bold 12px Arial, sans-serif',
+        fill: new ol.style.Fill({ color: '#ffffff' }),
+        stroke: new ol.style.Stroke({ color: '#064e3b', width: 3.5 }),
+        offsetY: 32
+    });
+
+    const fovStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 255, 136, 0.28)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: '#00ff88',
+            width: 2.5
+        }),
+        text: fovText
+    });
+
     // Calcular la geometría del cono de visión focal (FOV) del Dron
     function computeFovPolygon(lon, lat, headingDeg, altMeters) {
         const origin = ol.proj.fromLonLat([lon, lat]);
@@ -1760,8 +1837,8 @@
         const mercatorReach = reachMeters / Math.cos(latRad);
         
         const fovAngle = 70; // Ángulo de apertura de la cámara (70°)
-        const startAngle = headingDeg - fovAngle / 2;
-        const endAngle = headingDeg + fovAngle / 2;
+        const startAngle = (headingDeg || 0) - fovAngle / 2;
+        const endAngle = (headingDeg || 0) + fovAngle / 2;
         
         const ring = [[x0, y0]];
         const steps = 11;
@@ -1774,58 +1851,6 @@
         }
         ring.push([x0, y0]);
         return new ol.geom.Polygon([ring]);
-    }
-
-    function createFovStyle(reachMeters) {
-        const mText = Math.round(reachMeters) + 'm';
-        return new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(0, 255, 136, 0.32)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#00ff88',
-                width: 2.5
-            }),
-            text: new ol.style.Text({
-                text: '📐 Cobertura Focal: ' + mText + ' (70°)',
-                font: 'bold 12px Arial, sans-serif',
-                fill: new ol.style.Fill({ color: '#ffffff' }),
-                stroke: new ol.style.Stroke({ color: '#064e3b', width: 3.5 }),
-                offsetY: 32
-            })
-        });
-    }
-
-    // SVG de icono de Dron profesional en verde neón con rotación dinámica
-    function createDroneStyle(headingDeg, altMeters) {
-        const rad = (headingDeg || 0) * Math.PI / 180;
-        return new ol.style.Style({
-            image: new ol.style.Icon({
-                src: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-                        <circle cx="20" cy="20" r="18" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981" stroke-width="2"/>
-                        <!-- Aspas del Dron -->
-                        <circle cx="8" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
-                        <circle cx="32" cy="8" r="4" fill="#00ff88" stroke="#133c2e"/>
-                        <circle cx="8" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
-                        <circle cx="32" cy="32" r="4" fill="#00ff88" stroke="#133c2e"/>
-                        <!-- Cuerpo central -->
-                        <path d="M12 12 L28 28 M28 12 L12 28" stroke="#ffffff" stroke-width="2.5"/>
-                        <polygon points="20,6 26,20 14,20" fill="#00ff88" stroke="#133c2e" stroke-width="1.5"/>
-                    </svg>
-                `),
-                anchor: [0.5, 0.5],
-                scale: 1.1,
-                rotation: rad
-            }),
-            text: new ol.style.Text({
-                text: '🛸 Dron (' + (altMeters ? altMeters.toFixed(1) + 'm' : '56m') + ')',
-                font: 'bold 12px Arial, sans-serif',
-                fill: new ol.style.Fill({ color: '#ffffff' }),
-                stroke: new ol.style.Stroke({ color: '#133c2e', width: 3 }),
-                offsetY: -26
-            })
-        });
     }
 
     // Inicializar capas vectoriales para el mapa de OpenLayers
@@ -1932,18 +1957,24 @@
         flightVectorSource.addFeature(endPoint);
 
         // Cono de Visión Focal (FOV) de la Cámara (se agrega antes del dron para quedar por debajo)
-        const initReach = Math.max(85, (data.telemetry[0].alt || 50) * 2.4);
+        const p0 = data.telemetry[0];
+        const initReach = Math.round(Math.max(85, (p0.alt || 50) * 2.4));
+        fovText.setText('📐 Cobertura Focal: ' + initReach + 'm (70°)');
+        
         cameraFovFeature = new ol.Feature({
-            geometry: computeFovPolygon(data.telemetry[0].lon, data.telemetry[0].lat, data.telemetry[0].heading, data.telemetry[0].alt)
+            geometry: computeFovPolygon(p0.lon, p0.lat, p0.heading, p0.alt)
         });
-        cameraFovFeature.setStyle(createFovStyle(initReach));
+        cameraFovFeature.setStyle(fovStyle);
         flightVectorSource.addFeature(cameraFovFeature);
 
         // Marcador Dron Móvil
+        droneIcon.setRotation((p0.heading || 0) * Math.PI / 180);
+        droneText.setText('🛸 Dron (' + (p0.alt ? p0.alt.toFixed(1) + 'm' : '56m') + ')');
+        
         droneMarkerFeature = new ol.Feature({
             geometry: new ol.geom.Point(coords[0])
         });
-        droneMarkerFeature.setStyle(createDroneStyle(data.telemetry[0].heading, data.telemetry[0].alt));
+        droneMarkerFeature.setStyle(droneStyle);
         flightVectorSource.addFeature(droneMarkerFeature);
 
         // Ajustar vista del mapa a la trayectoria completa
@@ -1980,13 +2011,17 @@
         const point = pts[idx];
         if (point) {
             const coords = ol.proj.fromLonLat([point.lon, point.lat]);
+            
+            // Actualizar punto y rotación del Dron de forma ultra rápida
             droneMarkerFeature.getGeometry().setCoordinates(coords);
-            droneMarkerFeature.setStyle(createDroneStyle(point.heading, point.alt));
+            droneIcon.setRotation((point.heading || 0) * Math.PI / 180);
+            droneText.setText('🛸 Dron (' + (point.alt ? point.alt.toFixed(1) + 'm' : '56m') + ')');
 
+            // Actualizar geometría y etiqueta del Cono Focal (FOV 135m)
             if (cameraFovFeature) {
-                const curReach = Math.max(85, (point.alt || 50) * 2.4);
+                const curReach = Math.round(Math.max(85, (point.alt || 50) * 2.4));
                 cameraFovFeature.setGeometry(computeFovPolygon(point.lon, point.lat, point.heading, point.alt));
-                cameraFovFeature.setStyle(createFovStyle(curReach));
+                fovText.setText('📐 Cobertura Focal: ' + curReach + 'm (70°)');
             }
 
             // Actualizar interfaz HUD

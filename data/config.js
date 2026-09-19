@@ -3,6 +3,14 @@
 
 window.__CONFIG = {
     "BASE_LAYERS": {
+        "vari": {
+            "attribution": "Salud Vegetal VARI UAV INyDES 2026",
+            "label": "Salud vegetal (VARI)",
+            "maxZoom": 18,
+            "minZoom": 13,
+            "type": "xyz",
+            "url": "./ortofoto_VARI/tiles/{z}/{x}/{y}.png?v=76"
+        },
         // =====================================================================
         // OVERVIEW (50cm/px) - z=13..17 - "ver TODO Chapultepec"
         // =====================================================================
@@ -45,14 +53,6 @@ window.__CONFIG = {
             "minZoom": 13,
             "type": "xyz",
             "url": "./ortofoto_S4/RGB_overview/tiles/{z}/{x}/{y}.png?v=75"
-        },
-        "salud_overview": {
-            "attribution": "Salud Vegetal UAV INyDES 2026 S4 - overview 50cm/px",
-            "label": "Salud Vegetal (Seccion 4) (overview)",
-            "maxZoom": 17,
-            "minZoom": 13,
-            "type": "xyz",
-            "url": "./ortofoto_S4/SaludVegetal_overview/tiles/{z}/{x}/{y}.png?v=75"
         },
 
         // =====================================================================
@@ -98,14 +98,6 @@ window.__CONFIG = {
             "type": "xyz",
             "url": "./ortofoto_S4/RGB/tiles/{z}/{x}/{y}.png?v=75"
         },
-        "salud": {
-            "attribution": "Salud Vegetal UAV - INyDES 2026 - GSD 5cm/px",
-            "label": "Salud Vegetal (Seccion 4)",
-            "maxZoom": 19,
-            "minZoom": 15,
-            "type": "xyz",
-            "url": "./ortofoto_S4/SaludVegetal/tiles/{z}/{x}/{y}.png?v=75"
-        },
         "osm": {
             "attribution": "(c) OpenStreetMap contributors",
             "label": "Mapa base - OpenStreetMap",
@@ -114,6 +106,7 @@ window.__CONFIG = {
     },
     "CENTER": [-99.197, 19.414],
     "DEFAULT_BASE_LAYERS": [
+        "vari",
         "seccion1_overview",
         "seccion1_rgb",
         "seccion2_overview",
@@ -124,8 +117,6 @@ window.__CONFIG = {
         "seccion3_barrilaco_rgb",
         "seccion4_overview",
         "rgb",
-        "salud_overview",
-        "salud",
         "osm"
     ],
     "EXTENTS": {
