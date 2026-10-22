@@ -4,8 +4,8 @@
 window.__CONFIG = {
     "BASE_LAYERS": {
         "vari": {
-            "attribution": "Salud Vegetal VARI UAV INyDES 2026",
-            "label": "Salud vegetal (VARI)",
+            "attribution": "Salud Vegetal NDVI UAV INyDES 2026",
+            "label": "Salud vegetal (NDVI)",
             "maxZoom": 18,
             "minZoom": 13,
             "type": "xyz",

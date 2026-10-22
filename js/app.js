@@ -444,7 +444,7 @@
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="base-vari" ${userEnabledBases['vari'] ? 'checked' : ''}>
-                    <label class="form-check-label" for="base-vari" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="vari">Salud vegetal (VARI)</label>
+                    <label class="form-check-label" for="base-vari" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="vari">Salud vegetal (NDVI)</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="base-ortomosaico" ${isOrthoOn ? 'checked' : ''}>
