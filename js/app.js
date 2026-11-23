@@ -217,32 +217,96 @@
                         console.warn(`[visor] ${name}: 0 features leidas`);
                         return;
                     }
-                    // Estilo con etiqueta del nombre de la subzona
-                    const labelStyle = new ol.style.Style({
-                        fill: new ol.style.Fill({ color: hexToRgba(info.color, 0.30) }),
-                        stroke: new ol.style.Stroke({ color: info.color, width: 2 }),
-                        text: new ol.style.Text({
-                            text: '',  // se asigna en style function
-                            font: 'bold 13px sans-serif',
-                            fill: new ol.style.Fill({ color: '#1b4d3e' }),
-                            stroke: new ol.style.Stroke({ color: 'rgba(255,255,255,0.85)', width: 3 }),
-                            overflow: true,
-                            offsetY: 0,
-                        })
-                    });
-                    const layer = new ol.layer.Vector({
-                        source: new ol.source.Vector({ features }),
-                        style: (feature, resolution) => {
-                            const nombre = feature.get('nombre') || '';
-                            const subzona = feature.get('subzona') || '';
+                    features.forEach(f => f.set('_layerName', name));
+
+                    let layerStyle;
+                    if (name === 's1_vegetacion_5clases') {
+                        // Simbologia exacta por CATEGORIA / ID_CLASE con 50% de transparencia (alpha 0.50)
+                        const catStyles = {
+                            5: new ol.style.Style({
+                                fill: new ol.style.Fill({ color: 'rgba(0, 97, 0, 0.50)' }),     // #006100 - 5 - Vigor Muy Alto / Dosel denso
+                                stroke: new ol.style.Stroke({ color: 'rgba(0, 77, 0, 0.65)', width: 0.7 })
+                            }),
+                            4: new ol.style.Style({
+                                fill: new ol.style.Fill({ color: 'rgba(122, 171, 0, 0.50)' }),  // #7aab00 - 4 - Vigor Alto / Dosel arboreo sano
+                                stroke: new ol.style.Stroke({ color: 'rgba(95, 135, 0, 0.65)', width: 0.7 })
+                            }),
+                            3: new ol.style.Style({
+                                fill: new ol.style.Fill({ color: 'rgba(255, 255, 0, 0.50)' }),  // #ffff00 - 3 - Vigor Medio / Vegetacion moderada
+                                stroke: new ol.style.Stroke({ color: 'rgba(204, 204, 0, 0.65)', width: 0.7 })
+                            }),
+                            2: new ol.style.Style({
+                                fill: new ol.style.Fill({ color: 'rgba(255, 153, 0, 0.50)' }),  // #ff9900 - 2 - Vigor Bajo / Estres severo
+                                stroke: new ol.style.Stroke({ color: 'rgba(204, 122, 0, 0.65)', width: 0.7 })
+                            }),
+                            1: new ol.style.Style({
+                                fill: new ol.style.Fill({ color: 'rgba(255, 34, 0, 0.50)' }),   // #ff2200 - 1 - Sin vigor / Copa muerta o seca
+                                stroke: new ol.style.Stroke({ color: 'rgba(190, 20, 0, 0.70)', width: 0.8 })
+                            })
+                        };
+                        layerStyle = (feature) => {
+                            let idc = Number(feature.get('ID_CLASE') || 0);
+                            if (!idc) {
+                                const catStr = String(feature.get('CATEGORIA') || '').trim();
+                                idc = parseInt(catStr.charAt(0), 10) || 3;
+                            }
+                            return catStyles[idc] || catStyles[3];
+                        };
+                    } else if (name === 'copas_muertas') {
+                        // Poligono rojo
+                        layerStyle = new ol.style.Style({
+                            fill: new ol.style.Fill({ color: info.fillColor || 'rgba(217, 4, 41, 0.45)' }),
+                            stroke: new ol.style.Stroke({ color: info.strokeColor || '#d90429', width: info.strokeWidth || 2.5 })
+                        });
+                    } else if (name.startsWith('vegetacion')) {
+                        // Verde con transparencia, distinguiendo si es vegetacion alta o baja
+                        const styleAlta = new ol.style.Style({
+                            fill: new ol.style.Fill({ color: 'rgba(27, 94, 32, 0.45)' }), // Verde bosque denso
+                            stroke: new ol.style.Stroke({ color: '#1b4d3e', width: 1.5 })
+                        });
+                        const styleBaja = new ol.style.Style({
+                            fill: new ol.style.Fill({ color: 'rgba(46, 125, 50, 0.35)' }), // Verde translúcido
+                            stroke: new ol.style.Stroke({ color: '#2d6a4f', width: 1.2 })
+                        });
+                        layerStyle = (feature) => {
+                            const n = (feature.get('NOMBRE') || feature.get('nombre') || '').toLowerCase();
+                            return n.includes('alta') ? styleAlta : styleBaja;
+                        };
+                    } else {
+                        // Capas generales con soporte de etiquetas opcionales
+                        const fillColor = info.fillColor || (info.color ? hexToRgba(info.color, info.fillOpacity || 0.30) : 'rgba(30, 136, 229, 0.30)');
+                        const strokeColor = info.strokeColor || info.color || '#1e88e5';
+                        const strokeWidth = info.strokeWidth || 2;
+                        const labelStyle = new ol.style.Style({
+                            fill: new ol.style.Fill({ color: fillColor }),
+                            stroke: new ol.style.Stroke({ color: strokeColor, width: strokeWidth }),
+                            text: info.showLabels !== false ? new ol.style.Text({
+                                text: '',  // se asigna en style function
+                                font: 'bold 13px sans-serif',
+                                fill: new ol.style.Fill({ color: '#1b4d3e' }),
+                                stroke: new ol.style.Stroke({ color: 'rgba(255,255,255,0.85)', width: 3 }),
+                                overflow: true,
+                                offsetY: 0,
+                            }) : undefined
+                        });
+                        layerStyle = (feature, resolution) => {
+                            if (info.showLabels === false || !labelStyle.getText()) return labelStyle;
+                            const nombre = feature.get('nombre') || feature.get('NOMBRE') || '';
+                            const subzona = feature.get('subzona') || feature.get('SUBZONA') || '';
                             // Mostrar etiqueta solo en zooms altos (z>=15) o nombres cortos
                             const showLabel = resolution < 16 || nombre.length < 25;
                             labelStyle.getText().setText(
                                 showLabel ? `${subzona ? subzona + ' ' : ''}${nombre}` : ''
                             );
                             return labelStyle;
-                        },
-                        zIndex: 100  // Encima de TODAS las ortofotos
+                        };
+                    }
+
+                    const layerZIndex = info.zIndex || (name === 'copas_muertas' ? 95 : name.startsWith('vegetacion') ? 50 : 100);
+                    const layer = new ol.layer.Vector({
+                        source: new ol.source.Vector({ features }),
+                        style: layerStyle,
+                        zIndex: layerZIndex
                     });
                     layer.set('name', name);
                     layer.setVisible(info.visible !== false);
@@ -443,10 +507,6 @@
                     <small class="text-muted fw-semibold">Mapas base:</small>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="base-vari" ${userEnabledBases['vari'] ? 'checked' : ''}>
-                    <label class="form-check-label" for="base-vari" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="vari">Salud vegetal (NDVI)</label>
-                </div>
-                <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="base-ortomosaico" ${isOrthoOn ? 'checked' : ''}>
                     <label class="form-check-label" for="base-ortomosaico" style="font-size:0.85rem;cursor:pointer;font-weight:500;" data-layer-type="base" data-layer-name="ortomosaico">Ortomosaico</label>
                 </div>
@@ -474,11 +534,21 @@
                             <input class="form-check-input" type="checkbox" id="ov-${name}" ${overlays[name]?.layer.getVisible() ? 'checked' : ''}>
                             <label class="form-check-label fw-semibold" for="ov-${name}" style="font-size:0.85rem;cursor:pointer" data-layer-type="overlay" data-layer-name="${name}" title="Click derecho para opciones">${escapeHtml(info.label)}</label>
                         </div>
-                        <button class="btn btn-sm btn-outline-primary py-0 px-2 btn-open-table" data-layer="${name}" title="Ver tabla de atributos de ${escapeHtml(info.label)}">
-                            📊 Tabla
-                        </button>
+                        <div class="d-flex gap-1">
+                            ${info.shpZipUrl ? `<a class="btn btn-sm btn-success py-0 px-2" href="${escapeHtml(info.shpZipUrl)}" download title="Descargar Shapefile completo (.zip) de ${escapeHtml(info.label)}" style="font-size:0.74rem;text-decoration:none;">⬇ SHP (.zip)</a>` : ''}
+                            <button class="btn btn-sm btn-outline-primary py-0 px-2 btn-open-table" data-layer="${name}" title="Ver tabla de atributos de ${escapeHtml(info.label)}">
+                                📊 Tabla
+                            </button>
+                        </div>
                     </div>
-                    ` + (name === 'arboles' ? `<div class="mt-1 mb-2 p-2 rounded border p-2" style="font-size:10px; line-height: 1.2;">
+                    ` + (name === 's1_vegetacion_5clases' ? `<div class="mt-1 mb-2 p-2 rounded border" style="font-size:11px; line-height: 1.4; background: rgba(255,255,255,0.88);">
+                        <div style="font-weight: 700; margin-bottom: 4px; color: #1e293b;">CATEGORIA (Transparencia 50%):</div>
+                        <div class="d-flex align-items-center mb-1"><span style="display:inline-block;width:14px;height:11px;background:#006100;border:1px solid #333;margin-right:6px;"></span><span>5 - Vigor Muy Alto / Dosel denso</span></div>
+                        <div class="d-flex align-items-center mb-1"><span style="display:inline-block;width:14px;height:11px;background:#7aab00;border:1px solid #333;margin-right:6px;"></span><span>4 - Vigor Alto / Dosel arboreo sano</span></div>
+                        <div class="d-flex align-items-center mb-1"><span style="display:inline-block;width:14px;height:11px;background:#ffff00;border:1px solid #333;margin-right:6px;"></span><span>3 - Vigor Medio / Vegetacion moderada</span></div>
+                        <div class="d-flex align-items-center mb-1"><span style="display:inline-block;width:14px;height:11px;background:#ff9900;border:1px solid #333;margin-right:6px;"></span><span>2 - Vigor Bajo / Estres severo</span></div>
+                        <div class="d-flex align-items-center"><span style="display:inline-block;width:14px;height:11px;background:#ff2200;border:1px solid #333;margin-right:6px;"></span><span>1 - Sin vigor / Copa muerta o seca</span></div>
+                    </div>` : '') + (name === 'arboles' ? `<div class="mt-1 mb-2 p-2 rounded border p-2" style="font-size:10px; line-height: 1.2;">
                         <div style="font-weight: bold; margin-bottom: 4px; color: #333;">Concentración de árboles:</div>
                         <div class="d-flex align-items-center justify-content-between text-center">
                             <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2e7d32;border:1px solid #fff;"></span><br><span style="font-size:9px;color:#555;">1-20</span></div>
@@ -650,7 +720,7 @@
         for (const f of features) {
             const props = f.getProperties ? f.getProperties() : (f.properties || {});
             for (const k of Object.keys(props)) {
-                if (k === 'geometry') continue;
+                if (k === 'geometry' || k.startsWith('_')) continue;
                 colSet.add(k);
             }
         }
@@ -720,6 +790,7 @@
                         <button class="btn btn-sm btn-outline-light" id="attr-panel-last" title="Última página">»</button>
                     </div>
                     <button class="btn btn-sm btn-outline-light me-2" id="attr-panel-csv" title="Descargar CSV"><span style="font-size:1.05em">⬇</span> CSV</button>
+                    ${info.shpZipUrl ? `<a class="btn btn-sm btn-success me-2" href="${escapeHtml(info.shpZipUrl)}" download title="Descargar Shapefile completo (.zip)"><span style="font-size:1.05em">📦</span> SHP (.zip)</a>` : ''}
                     <button class="btn btn-sm btn-light me-2" id="attr-panel-minimize" title="Minimizar/Maximizar">▼</button>
                     <button class="btn-close btn-close-white" id="attr-panel-close" title="Cerrar panel" aria-label="Close"></button>
                 </div>
@@ -1196,8 +1267,9 @@
                 // Es un cluster (real o fake): agregar CADA arbol interno
                 inner.forEach(sf => hits.push({ tipo: 'arbol', feature: sf, source: 'arboles' }));
             } else {
-                // Es un feature regular (subzona u otro polygon)
-                hits.push({ tipo: 'subzona', feature: f, source: 'subzonas' });
+                // Es un feature regular (subzona, copas_muertas, vegetacion_clip, etc.)
+                const layerName = f.get('_layerName') || 'subzonas';
+                hits.push({ tipo: layerName, feature: f, source: layerName });
             }
         }
 
@@ -1357,6 +1429,12 @@
             if (h.tipo === 'arbol') cardHtml = treeCard(h.feature);
             else if (h.tipo === 'subzona' || h.tipo === 'subzonas' || h.tipo === 'subzonas_v3') {
                 cardHtml = subzonaCard(h.feature, h.tipo === 'subzonas_v3' ? 'Subzonas v3' : null);
+            } else if (h.tipo === 'copas_muertas' || h.source === 'copas_muertas') {
+                cardHtml = copasMuertasCard(h.feature);
+            } else if (String(h.tipo).startsWith('vegetacion') || String(h.source).startsWith('vegetacion')) {
+                cardHtml = vegetacionCard(h.feature);
+            } else {
+                cardHtml = genericCard(h.feature, h.source || 'Elemento');
             }
             html += `<div class="feature-info-card mb-2" data-hit-idx="${idx}" style="cursor:pointer;" title="Click para seleccionar en tabla de atributos">${cardHtml}</div>`;
         });
@@ -1413,6 +1491,44 @@
                 <tr><td class="text-muted"><small>Reducción escorrentía</small></td><td><small>${escape(p.reduccion_escorrentia || '')}</small></td></tr>
                 <tr><td class="text-muted"><small>Valor servicios</small></td><td><small>${escape(p.valor_servicios_mxn || '')}</small></td></tr>
             </table></div>`;
+    }
+
+    function copasMuertasCard(f) {
+        const p = f.getProperties();
+        const area = p.Shape_Area != null ? Number(p.Shape_Area).toFixed(2) + ' m²' : '-';
+        const perim = p.Shape_Length != null ? Number(p.Shape_Length).toFixed(2) + ' m' : '-';
+        return `<div class="mb-2"><strong style="color:#d90429;">🍂 Copa Muerta</strong>
+            <table class="table table-sm table-bordered mb-0">
+                <tr><td class="text-muted" style="width:45%"><small>Superficie copa</small></td><td><small><strong>${escape(area)}</strong></small></td></tr>
+                <tr><td class="text-muted"><small>Perímetro</small></td><td><small>${escape(perim)}</small></td></tr>
+                <tr><td class="text-muted"><small>Condición</small></td><td><span class="badge bg-danger" style="font-size:0.75rem;">Arbolado Muerto / Decadente</span></td></tr>
+            </table></div>`;
+    }
+
+    function vegetacionCard(f) {
+        const p = f.getProperties();
+        const nombre = p.NOMBRE || p.nombre || 'Vegetación';
+        const seccion = p.SECCION || p.seccion || '-';
+        const areaM2 = p.AREA_M2 != null ? Number(p.AREA_M2).toLocaleString('es-MX', { maximumFractionDigits: 2 }) + ' m²' : (p.Shape_Area ? Number(p.Shape_Area).toFixed(2) + ' m²' : '-');
+        const areaHa = p.AREA_HA != null ? Number(p.AREA_HA).toFixed(4) + ' ha' : '-';
+        const claseBadge = String(nombre).toLowerCase().includes('alta') ? 'bg-success' : 'bg-primary';
+        return `<div class="mb-2"><strong style="color:#1b4d3e;">🌿 Cobertura Vegetal</strong>
+            <table class="table table-sm table-bordered mb-0">
+                <tr><td class="text-muted" style="width:45%"><small>Tipo cobertura</small></td><td><span class="badge ${claseBadge}" style="font-size:0.75rem;">${escape(nombre)}</span></td></tr>
+                <tr><td class="text-muted"><small>Sección</small></td><td><small><strong>${escape(seccion)}</strong></small></td></tr>
+                <tr><td class="text-muted"><small>Área (m²)</small></td><td><small>${escape(areaM2)}</small></td></tr>
+                <tr><td class="text-muted"><small>Área (ha)</small></td><td><small>${escape(areaHa)}</small></td></tr>
+            </table></div>`;
+    }
+
+    function genericCard(f, label) {
+        const p = f.getProperties ? f.getProperties() : (f.properties || {});
+        const rows = Object.entries(p)
+            .filter(([k, v]) => k !== 'geometry' && !k.startsWith('_') && v != null && v !== '')
+            .map(([k, v]) => `<tr><td class="text-muted"><small>${escape(k)}</small></td><td><small>${escape(typeof v === 'number' ? v.toFixed(2) : v)}</small></td></tr>`)
+            .join('');
+        return `<div class="mb-2"><strong>📍 ${escape(label)}</strong>
+            <table class="table table-sm table-bordered mb-0">${rows || '<tr><td><small class="text-muted">Sin atributos</small></td></tr>'}</table></div>`;
     }
 
     function showTreeInfo(f) {

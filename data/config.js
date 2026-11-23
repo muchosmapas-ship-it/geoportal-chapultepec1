@@ -3,14 +3,6 @@
 
 window.__CONFIG = {
     "BASE_LAYERS": {
-        "vari": {
-            "attribution": "Salud Vegetal NDVI UAV INyDES 2026",
-            "label": "Salud vegetal (NDVI)",
-            "maxZoom": 18,
-            "minZoom": 13,
-            "type": "xyz",
-            "url": "./ortofoto_VARI/tiles/{z}/{x}/{y}.png?v=77"
-        },
         // =====================================================================
         // OVERVIEW (50cm/px) - z=13..17 - "ver TODO Chapultepec"
         // =====================================================================
@@ -106,7 +98,6 @@ window.__CONFIG = {
     },
     "CENTER": [-99.2072, 19.4081],
     "DEFAULT_BASE_LAYERS": [
-        "vari",
         "seccion1_overview",
         "seccion1_rgb",
         "seccion2_overview",
@@ -142,10 +133,20 @@ window.__CONFIG = {
     "MAX_ZOOM": 21,
     "MIN_ZOOM": 13,
     "OVERLAY_LAYERS": {
+        "s1_vegetacion_5clases": {
+            "color": "#38a800",
+            "label": "Vigor del Dosel Vegetal (Sección 1)",
+            "url": "./data/S1_Vegetacion_5Clases_Ligero.geojson?v=6",
+            "shpZipUrl": "./data/descargas_shp/Vigor_Vegetacion_S1_Shapefile.zip?v=6",
+            "visible": true,
+            "showLabels": false,
+            "zIndex": 60
+        },
         "subzonas": {
             "color": "#1e88e5",
-            "label": "Subzonas",
+            "label": "Subzonas del Bosque",
             "url": "./data/subzonas.geojson?v=75",
+            "shpZipUrl": "./data/descargas_shp/Subzonas_Bosque_Chapultepec_Shapefile.zip",
             "visible": false
         }
     },
