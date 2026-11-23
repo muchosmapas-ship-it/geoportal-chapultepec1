@@ -136,8 +136,8 @@ window.__CONFIG = {
         "s1_vegetacion_5clases": {
             "color": "#38a800",
             "label": "Vigor del Dosel Vegetal (Sección 1)",
-            "url": "./data/S1_Vegetacion_5Clases_Ligero.geojson?v=6",
-            "shpZipUrl": "./data/descargas_shp/Vigor_Vegetacion_S1_Shapefile.zip?v=6",
+            "url": "./data/S1_Vegetacion_5Clases_Ligero.geojson?v=7",
+            "shpZipUrl": "./data/descargas_shp/Vigor_Vegetacion_S1_Shapefile.zip?v=7",
             "visible": true,
             "showLabels": false,
             "zIndex": 60
